@@ -1,8 +1,6 @@
 <?php
 namespace Grav\Plugin;
 
-use Grav\Common\Config;
-use Grav\Common\Grav;
 use Grav\Common\Plugin;
 use Grav\Component\EventDispatcher\Event;
 
@@ -28,50 +26,62 @@ class YoutubePlugin extends Plugin
     }
 
     /**
-     * Replace youtube links with embed
+     *
      * @param Event $event
      */
     public function onPageProcessed(Event $event)
     {
         /** @var \Grav\Common\Page\Page $page */
         $page = $event->offsetGet('page');
+        $content = $this->replaceYoutubeLinks($page->content());
 
+        $page->content($content);
+    }
+
+    /**
+     * Replace youtube links with embed
+     * @param $html
+     * @return string
+     */
+    public function replaceYoutubeLinks($html)
+    {
         $doc = new \DOMDocument();
-        $doc->loadHTML($page->content(), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
         $xpath = new \DOMXPath($doc);
         $nodes = $xpath->query("//a[contains(@href, 'youtu')]");
 
-
         if (empty($nodes)) {
-            return;
+            return $html;
         }
 
         /** @var \DOMNode $node */
         foreach ($nodes as $node) {
-            if (!($href = $node->attributes->getNamedItem('href'))) {
+            if ( !($href = $node->attributes->getNamedItem('href')) ) {
                 continue;
             }
 
-            if ($src = $this->prepareEmbedSrc($href->nodeValue)) {
-                $newNode = $this->createDOMNode(
-                    $doc, 'div', (array)$this->config('container_html_attr', [])
-                );
-
-                $frameHtmlAttributes = array_merge(
-                    ['src' => $src],
-                    (array)$this->config('embed_html_attr', [])
-                );
-
-                $newNode->appendChild(
-                    $this->createDOMNode($doc, 'iframe', $frameHtmlAttributes)
-                );
-
-                $node->parentNode->replaceChild($newNode, $node);
+            if ( !($src = $this->prepareEmbedSrc($href->nodeValue)) ) {
+                continue;
             }
+
+            $newNode = $this->createDOMNode(
+                $doc, 'div', (array)$this->config('container_html_attr', [])
+            );
+
+            $frameHtmlAttributes = array_merge(
+                ['src' => $src],
+                (array)$this->config('embed_html_attr', [])
+            );
+
+            $newNode->appendChild(
+                $this->createDOMNode($doc, 'iframe', $frameHtmlAttributes)
+            );
+
+            $node->parentNode->replaceChild($newNode, $node);
         }
 
-        $page->content($doc->saveHTML());
+        return $doc->saveHTML();
     }
 
     /**
