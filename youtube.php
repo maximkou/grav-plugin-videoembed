@@ -1,6 +1,8 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Config;
+use Grav\Common\Grav;
 use Grav\Common\Plugin;
 use Grav\Component\EventDispatcher\Event;
 
@@ -14,13 +16,6 @@ use Grav\Component\EventDispatcher\Event;
 class YoutubePlugin extends Plugin
 {
     const VALID_YOUTUBE_URL_REGEXP = '/(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(watch\?v=|v\/|u\/|embed\/?)?(videoseries\?list=(.*)|[\w-]{11}|\?listType=(.*)&list=(.*)).*/i';
-
-    protected $options;
-
-    public function __construct()
-    {
-        $this->options = $this->config->get('plugins.youtube');
-    }
 
     /**
      * @return array
@@ -59,9 +54,17 @@ class YoutubePlugin extends Plugin
             }
 
             if ($src = $this->prepareEmbedSrc($href->nodeValue)) {
-                $newNode = $this->createDOMNode('div', ['class' => 'video-container']);
+                $newNode = $this->createDOMNode(
+                    $doc, 'div', (array)$this->config('container_html_attr', [])
+                );
+
+                $frameHtmlAttributes = array_merge(
+                    ['src' => $src],
+                    (array)$this->config('embed_html_attr', [])
+                );
+
                 $newNode->appendChild(
-                    $this->createDOMNode('iframe', ['src' => $src])
+                    $this->createDOMNode($doc, 'iframe', $frameHtmlAttributes)
                 );
 
                 $node->parentNode->replaceChild($newNode, $node);
@@ -90,8 +93,8 @@ class YoutubePlugin extends Plugin
         }
 
         $embedParams = '';
-        if (!empty($this->options['embed_options'])) {
-            $embedParams = '?'.http_build_query($this->options['embed_options']);
+        if ($this->config('embed_options')) {
+            $embedParams = '?'.http_build_query($this->config('embed_options'));
         }
 
         return '//youtube.com/embed/'.$matches[3].$embedParams;
@@ -99,14 +102,13 @@ class YoutubePlugin extends Plugin
 
     /**
      * Create node with passed attributes
+     * @param $doc \DOMDocument
      * @param $name string dom node name
      * @param array $attributes
      * @return \DOMElement
      */
-    protected function createDOMNode($name, array $attributes = [])
+    protected function createDOMNode(\DOMDocument $doc, $name, array $attributes = [])
     {
-        $doc = new \DOMDocument();
-
         $node = $doc->createElement($name);
         $this->batchSetAttributes(
             [$node, 'setAttribute'],
@@ -117,7 +119,7 @@ class YoutubePlugin extends Plugin
     }
 
     /**
-     * Set many attributes for node, e.g. [src => google.com', class => video]
+     * Set many attributes for node, e.g. [src => google.com, class => video]
      * @param $setter \Callable
      * @param array $attributes
      * @throws \InvalidArgumentException
@@ -131,5 +133,16 @@ class YoutubePlugin extends Plugin
         foreach ($attributes as $attr => $value) {
             call_user_func($setter, $attr, $value);
         }
+    }
+
+    /**
+     * Get plugin specific config
+     * @param $key
+     * @param null $default
+     * @return mixed
+     */
+    protected function config($key, $default = null)
+    {
+        return $this->config->get('plugins.youtube.'.$key, $default);
     }
 }
