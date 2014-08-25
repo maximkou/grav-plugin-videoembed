@@ -1,0 +1,16 @@
+name: Youtube
+version: 1.0.0
+description: Convert youtube urls into embed video.
+
+form:
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin status
+      highlight: 1
+      default: 0
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
