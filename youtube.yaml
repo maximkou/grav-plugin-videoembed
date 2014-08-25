@@ -1,1 +1,11 @@
 enabled: true
+
+embed_options:
+    autoplay   : 1,
+    autohide   : 1,
+    fs         : 1,
+    rel        : 0,
+    hd         : 1,
+    vq         : 'hd1080',
+    wmode      : 'opaque',
+    enablejsapi: 1

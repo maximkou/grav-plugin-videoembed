@@ -6,22 +6,36 @@ use Grav\Component\EventDispatcher\Event;
 
 /**
  * Class YoutubePlugin
+ * This plugin replace links to youtube and replace it with embed element
  * @package Grav\Plugin
+ * @author Maxim Hodyrev <maximkou@gmail.com>
  * @property $grav \Grav\Common\Grav
  */
 class YoutubePlugin extends Plugin
 {
     const VALID_YOUTUBE_URL_REGEXP = '/(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(watch\?v=|v\/|u\/|embed\/?)?(videoseries\?list=(.*)|[\w-]{11}|\?listType=(.*)&list=(.*)).*/i';
 
+    protected $options;
+
+    public function __construct()
+    {
+        $this->options = $this->config->get('plugins.youtube');
+    }
+
     /**
      * @return array
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
             'onPageProcessed' => ['onPageProcessed', 0],
         ];
     }
 
+    /**
+     * Replace youtube links with embed
+     * @param Event $event
+     */
     public function onPageProcessed(Event $event)
     {
         /** @var \Grav\Common\Page\Page $page */
@@ -33,30 +47,89 @@ class YoutubePlugin extends Plugin
         $xpath = new \DOMXPath($doc);
         $nodes = $xpath->query("//a[contains(@href, 'youtu')]");
 
-        if (!empty($nodes)) {
-            /** @var \DOMNode $node */
-            foreach ($nodes as $node) {
-                $isYoutubeVideo = preg_match(
-                    self::VALID_YOUTUBE_URL_REGEXP,
-                    $node->attributes->getNamedItem('href')->nodeValue,
-                    $matches
+
+        if (empty($nodes)) {
+            return;
+        }
+
+        /** @var \DOMNode $node */
+        foreach ($nodes as $node) {
+            if (!($href = $node->attributes->getNamedItem('href'))) {
+                continue;
+            }
+
+            if ($src = $this->prepareEmbedSrc($href->nodeValue)) {
+                $newNode = $this->createDOMNode('div', ['class' => 'video-container']);
+                $newNode->appendChild(
+                    $this->createDOMNode('iframe', ['src' => $src])
                 );
 
-                if ($isYoutubeVideo) {
-                    $newNode = $doc->createElement('div');
-                    $newNode->setAttribute('class', 'video-container');
-
-                    $iframe = $doc->createElement('iframe');
-                    $iframe->setAttribute(
-                        'src',
-                        '//youtube.com/embed/'.$matches[3]
-                    );
-                    $newNode->appendChild($iframe);
-                    $node->parentNode->replaceChild($newNode, $node);
-                }
+                $node->parentNode->replaceChild($newNode, $node);
             }
         }
 
         $page->content($doc->saveHTML());
+    }
+
+    /**
+     * Check validity and add custom params for embed,
+     * which defined in `embed_options` section of `youtube.yaml`
+     * @param $sourceUrl string raw youtube url
+     * @return null|string
+     */
+    protected function prepareEmbedSrc($sourceUrl)
+    {
+        $isYoutubeVideo = preg_match(
+            self::VALID_YOUTUBE_URL_REGEXP,
+            $sourceUrl,
+            $matches
+        );
+
+        if (!$isYoutubeVideo) {
+            return null;
+        }
+
+        $embedParams = '';
+        if (!empty($this->options['embed_options'])) {
+            $embedParams = '?'.http_build_query($this->options['embed_options']);
+        }
+
+        return '//youtube.com/embed/'.$matches[3].$embedParams;
+    }
+
+    /**
+     * Create node with passed attributes
+     * @param $name string dom node name
+     * @param array $attributes
+     * @return \DOMElement
+     */
+    protected function createDOMNode($name, array $attributes = [])
+    {
+        $doc = new \DOMDocument();
+
+        $node = $doc->createElement($name);
+        $this->batchSetAttributes(
+            [$node, 'setAttribute'],
+            $attributes
+        );
+
+        return $node;
+    }
+
+    /**
+     * Set many attributes for node, e.g. [src => google.com', class => video]
+     * @param $setter \Callable
+     * @param array $attributes
+     * @throws \InvalidArgumentException
+     */
+    protected function batchSetAttributes($setter, array $attributes)
+    {
+        if (!is_callable($setter)) {
+            throw new \InvalidArgumentException('Func must be callable');
+        }
+
+        foreach ($attributes as $attr => $value) {
+            call_user_func($setter, $attr, $value);
+        }
     }
 }
