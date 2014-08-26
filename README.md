@@ -1,4 +1,4 @@
-Youtube plugin for [Grav CMS](http://getgrav.com)
+Youtube plugin for [Grav CMS](http://getgrav.org)
 -------------------------------------------------
 
 This plugin convert Youtube links in page content to embed format.
@@ -74,12 +74,17 @@ embed_options:
 
 ```
 
-You can override default `embed_options` for each video, for do this simply add params to end of video url.
-Example (using default options): link `http://youtu.be/AsdjHDHksdf?autoplay=0&wmode=transparent` will be converted to:
+You can override default `embed_options` for each video, for do this simply add params to end of video url. Your params will be applied on default embed options.
+
+Example (using default options), link 
+```
+http://youtu.be/AsdjHDHksdf?autoplay=0&wmode=transparent
+```
+will be converted to something like this:
 
 ```html
 <div class="video-container">
-	<iframe src="//youtube.com/embed/AsdjHDHksdf?autoplay=0&autohide=1&fs=1&rel=0&hd=1&vq=hd1080&wmode=transparent&enablejsapi=1"></iframe>
+	<iframe src="//youtube.com/embed/AsdjHDHksdf?autoplay=0&rel=0&hd=1&vq=hd1080&wmode=transparent"></iframe>
 </div>
 ```
 
