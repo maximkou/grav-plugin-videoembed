@@ -31,6 +31,7 @@ class YoutubePlugin extends Plugin
         /** @var \Grav\Common\Page\Page $page */
         $page = $event->offsetGet('page');
         $content = $this->replaceYoutubeLinks($page->content());
+        $page->process(['twig' => true]);
 
         $page->content($content);
     }
