@@ -13,8 +13,6 @@ use Grav\Component\EventDispatcher\Event;
  */
 class YoutubePlugin extends Plugin
 {
-    const VALID_YOUTUBE_URL_REGEXP = '/(youtube\.com|youtu\.be|youtube-nocookie\.com)\/(watch\?v=|v\/|u\/|embed\/?)?(videoseries\?list=(.*)|[\w-]{11}|\?listType=(.*)&list=(.*)).*/i';
-
     /**
      * @return array
      */
@@ -26,7 +24,6 @@ class YoutubePlugin extends Plugin
     }
 
     /**
-     *
      * @param Event $event
      */
     public function onPageProcessed(Event $event)
@@ -45,69 +42,58 @@ class YoutubePlugin extends Plugin
      */
     public function replaceYoutubeLinks($html)
     {
-        $doc = new \DOMDocument();
-        $doc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $urlRegExpr = $this->getRegExpr();
+        $linkRegexp = "/<a href=\"$urlRegExpr\">$urlRegExpr<\/a>/i";
 
-        $xpath = new \DOMXPath($doc);
-        $nodes = $xpath->query("//a[contains(@href, 'youtu')]");
+        $document = new \DOMDocument();
+        $containerNode = $this->createDOMNode(
+            $document,
+            'div',
+            (array)$this->config('container_html_attr', [])
+        );
+        $frameNode = $this->createDOMNode(
+            $document,
+            'iframe',
+            (array)$this->config('embed_html_attr', [])
+        );
+        $containerNode->appendChild($frameNode);
 
-        if (empty($nodes)) {
-            return $html;
-        }
+        $embedOptions = $this->config('embed_options', []);
 
-        /** @var \DOMNode $node */
-        foreach ($nodes as $node) {
-            if ( !($href = $node->attributes->getNamedItem('href')) ) {
-                continue;
+        return preg_replace_callback($linkRegexp, function ($matches) use ($document, $frameNode, $embedOptions) {
+            $embedUrl = '//youtube.com/embed/'.$matches[7];
+            $userOpts = [];
+            if (!empty($matches[11])) {
+                parse_str(trim($matches[11], '?&'), $userOpts);
+            }
+            $userOpts = array_merge($embedOptions, $userOpts);
+
+            if (!empty($userOpts)) {
+                $embedUrl .= '?'.http_build_query($userOpts);
             }
 
-            if ( !($src = $this->prepareEmbedSrc($href->nodeValue)) ) {
-                continue;
-            }
+            $frameNode->setAttribute('src', $embedUrl);
 
-            $newNode = $this->createDOMNode(
-                $doc, 'div', (array)$this->config('container_html_attr', [])
-            );
-
-            $frameHtmlAttributes = array_merge(
-                ['src' => $src],
-                (array)$this->config('embed_html_attr', [])
-            );
-
-            $newNode->appendChild(
-                $this->createDOMNode($doc, 'iframe', $frameHtmlAttributes)
-            );
-
-            $node->parentNode->replaceChild($newNode, $node);
-        }
-
-        return $doc->saveHTML();
+            return html_entity_decode($document->saveHTML($frameNode->parentNode));
+        }, $html);
     }
 
     /**
-     * Check validity and add custom params for embed,
-     * which defined in `embed_options` section of `youtube.yaml`
-     * @param $sourceUrl string raw youtube url
-     * @return null|string
+     * Get youtube video reg expression
+     * @return string
      */
-    protected function prepareEmbedSrc($sourceUrl)
+    protected function getRegExpr()
     {
-        $isYoutubeVideo = preg_match(
-            self::VALID_YOUTUBE_URL_REGEXP,
-            $sourceUrl,
-            $matches
-        );
+        // starts with scheme, www
+        $r = '(http|https)?(:)?(\/\/)?(www\.)?';
+        // youtube valid hosts
+        $r .= '(youtube\.com|youtu\.be|youtube-nocookie\.com)\/';
+        // video ID
+        $r .= '(watch\?v=|v\/|u\/|embed\/?)?(videoseries\?list=(.*)|[\w-]{11}|\?listType=(.*)&list=(.*))';
+        // more params
+        $r .= '([a-z0-9-._~:\/\?#\[\]@!$&\'()*\+,;\=]*)';
 
-        if (!$isYoutubeVideo) {
-            return null;
-        }
-
-        $embedParams = '';
-        if ($this->config('embed_options')) {
-            $embedParams = '?'.http_build_query($this->config('embed_options'));
-        }
-
-        return '//youtube.com/embed/'.$matches[3].$embedParams;
+        return $r;
     }
 
     /**

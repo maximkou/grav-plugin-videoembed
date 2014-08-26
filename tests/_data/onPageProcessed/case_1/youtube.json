@@ -1,6 +1,10 @@
 {
-    "enabled": true,
-    "container_html_attr": {
-        "class": "video-container"
+    "plugins": {
+        "youtube": {
+            "enabled": true,
+            "container_html_attr": {
+                "class": "video-container"
+            }
+        }
     }
 }

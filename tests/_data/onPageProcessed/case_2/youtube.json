@@ -1,15 +1,19 @@
 {
-    "enabled": true,
-    "container_html_attr": {
-        "class": "container"
-    },
-    "embed_html_attr": {
-        "frameborder": 0,
-        "width"      : 560
-    },
-    "embed_options": {
-        "autoplay"   : 1,
-        "autohide"   : 1,
-        "wmode"      : "opaque"
+    "plugins": {
+        "youtube": {
+            "enabled": true,
+            "container_html_attr": {
+                "class": "container"
+            },
+            "embed_html_attr": {
+                "frameborder": 0,
+                "width"      : 560
+            },
+            "embed_options": {
+                "autoplay"   : 1,
+                "autohide"   : 1,
+                "wmode"      : "opaque"
+            }
+        }
     }
 }
