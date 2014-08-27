@@ -4,10 +4,8 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c7b560c80c22854db959df8827e7bad1",
-    "packages": [
-
-    ],
+    "hash": "acb503d2507f3f3e202ebc152e059e5d",
+    "packages": [],
     "packages-dev": [
         {
             "name": "doctrine/cache",
@@ -1468,9 +1466,7 @@
             "time": "2014-07-05 12:19:05"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "erusev/parsedown-extra": 20,
@@ -1478,10 +1474,6 @@
         "getgrav/grav": 20
     },
     "prefer-stable": false,
-    "platform": [
-
-    ],
-    "platform-dev": [
-
-    ]
+    "platform": [],
+    "platform-dev": []
 }
