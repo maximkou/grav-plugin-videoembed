@@ -1,6 +1,6 @@
-name: Youtube
+name: VideoEmbed
 version: 1.0.0
-description: Convert youtube urls into embed video.
+description: Convert links to videos into embed video.
 
 form:
   fields:

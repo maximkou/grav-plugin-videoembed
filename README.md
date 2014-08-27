@@ -1,7 +1,7 @@
-Youtube plugin for [Grav CMS](http://getgrav.org)
+Embed Video plugin for [Grav CMS](http://getgrav.org)
 -------------------------------------------------
 
-This plugin convert Youtube links in page content to embed format.
+This plugin convert links to videos from sharing services in page to embed format.
 
 ## Example
 
@@ -29,14 +29,14 @@ Simply add plugin dependency into `.dependencies` file, e.g:
 ```
 git:
     youtube:
-        url: https://github.com/maximkou/grav-plugin-youtube.git
-        path: user/plugins/youtube
+        url: https://github.com/maximkou/grav-plugin-videoembed.git
+        path: user/plugins/videoembed
         branch: master
 
 links:
     youtube:
-        src: grav-plugin-youtube
-        path: user/plugins/youtube
+        src: grav-plugin-videoembed
+        path: user/plugins/videoembed
         scm: github
 ```
 
@@ -44,34 +44,31 @@ And then run `php bin/grav install`. That's all!
 
 ## Configuration
 
-All configuration rules located in `youtube.yaml`
+All configuration rules located in `videoembed.yaml`
 
 ### Default config
 
 ```
 enabled: true
 
-# default embed container html attributes
-container_html_attr:
-    class: video-container
-
-# default embed element html attributes
-embed_html_attr:
-    frameborder: 0
-    width      : 560
-    height     : 315
-
-# default embed video params
-embed_options:
-    autoplay   : 1
-    autohide   : 1
-    fs         : 1
-    rel        : 0
-    hd         : 1
-    vq         : hd1080
-    wmode      : opaque
-    enablejsapi: 1
-
+services:
+    youtube:
+        enabled: true
+        container_html_attr:
+            class: video-container
+        embed_html_attr:
+            frameborder: 0
+            width      : 560
+            height     : 315
+        embed_options:
+            autoplay   : 1
+            autohide   : 1
+            fs         : 1
+            rel        : 0
+            hd         : 1
+            vq         : hd1080
+            wmode      : opaque
+            enablejsapi: 1
 ```
 
 You can override default `embed_options` for each video, for do this simply add params to end of video url. Your params will be applied on default embed options.

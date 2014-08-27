@@ -1,12 +1,12 @@
 {
-   "project":"grav-plugin-youtube",
+   "project":"grav-plugin-videoembed",
    "platforms":{
       "grav":{
          "nodes":{
             "plugin":[
                {
                   "source":"/",
-                  "destination":"/user/plugins/youtube"
+                  "destination":"/user/plugins/videoembed"
                }
             ]
          }

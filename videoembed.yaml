@@ -1,0 +1,20 @@
+enabled: true
+
+services:
+    youtube:
+        enabled: true
+        container_html_attr:
+            class: video-container
+        embed_html_attr:
+            frameborder: 0
+            width      : 560
+            height     : 315
+        embed_options:
+            autoplay   : 1
+            autohide   : 1
+            fs         : 1
+            rel        : 0
+            hd         : 1
+            vq         : hd1080
+            wmode      : opaque
+            enablejsapi: 1

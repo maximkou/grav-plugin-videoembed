@@ -1,6 +1,6 @@
 {
-    "name": "maximkou/grav-plugin-youtube",
-    "description": "Youtube plugin for Grav CMS",
+    "name": "maximkou/grav-plugin-videoembed",
+    "description": "Videoembed plugin for Grav CMS",
     "minimum-stability": "stable",
     "license": "MIT",
     "authors": [
