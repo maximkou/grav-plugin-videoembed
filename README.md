@@ -1,6 +1,6 @@
 Embed Video plugin for [Grav CMS](http://getgrav.org)
 -------------------------------------------------
-[![Build Status](https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v0.1-alpha)](https://travis-ci.org/maximkou/grav-plugin-videoembed)
+[![Build Status](https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v1.0)](https://travis-ci.org/maximkou/grav-plugin-videoembed)
 
 This plugin converts video links to embed format.
 Supported services:
