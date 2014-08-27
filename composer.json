@@ -37,9 +37,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Maximkou\\GravPluginYoutube\\Tests\\": "tests/",
-            "Grav\\": "vendor/getgrav/grav/system/src/Grav"
+            "Grav\\Plugin\\VideoEmbed\\Tests\\": "tests/",
+            "Grav\\": "vendor/getgrav/grav/system/src/Grav",
+            "Grav\\Plugin\\VideoEmbed\\": "src/"
         },
-        "files": ["youtube.php"]
+        "files": ["videoembed.php"]
     }
 }

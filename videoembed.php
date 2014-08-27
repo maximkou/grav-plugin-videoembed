@@ -37,12 +37,20 @@ class VideoEmbedPlugin extends Plugin
         $content = $page->content();
         $services = $this->getEnabledServicesSettings();
 
-        foreach ($services as $serviceName => $serviceConfig) {
-            $service = $this->getServiceByName($serviceName, $serviceConfig);
-            $content = $service->processHtml($content);
+        $container = null;
+        if ($cElem = $this->config->get('plugins.videoembed.container.element')) {
+            $document = new \DOMDocument();
+            $container = $document->createElement($cElem);
+            $containerAttr = (array)$this->config->get('plugins.videoembed.container.html_attr', []);
+            foreach ($containerAttr as $htmlAttr => $attrValue) {
+                $container->setAttribute($htmlAttr, $attrValue);
+            }
         }
 
-        $page->process(['twig' => true]);
+        foreach ($services as $serviceName => $serviceConfig) {
+            $service = $this->getServiceByName($serviceName, $serviceConfig);
+            $content = $service->processHtml($content, $container);
+        }
 
         $page->content($content);
     }
@@ -51,7 +59,7 @@ class VideoEmbedPlugin extends Plugin
      * Enabled services settings
      * @return array
      */
-    protected function getEnabledServicesSettings()
+    public function getEnabledServicesSettings()
     {
         $services = (array)$this->config->get('plugins.videoembed.services');
 
@@ -63,7 +71,7 @@ class VideoEmbedPlugin extends Plugin
     /**
      * @param $serviceName
      * @param array $serviceConfig
-     * @return \Grav\Plugin\VideoEmbed\Service\ServiceInterface
+     * @return \Grav\Plugin\VideoEmbed\ServiceInterface
      * @throws \Exception
      */
     protected function getServiceByName($serviceName, array $serviceConfig = [])

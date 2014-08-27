@@ -1,5 +1,5 @@
 <?php
-namespace Grav\Plugin\VideoEmbed\Service;
+namespace Grav\Plugin\VideoEmbed;
 
 interface ServiceInterface
 {

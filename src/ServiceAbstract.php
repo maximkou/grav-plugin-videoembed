@@ -1,5 +1,7 @@
 <?php
-namespace Grav\Plugin\VideoEmbed\Service;
+namespace Grav\Plugin\VideoEmbed;
+
+require_once __DIR__ . "/ServiceInterface.php";
 
 abstract class ServiceAbstract implements ServiceInterface
 {
@@ -13,26 +15,31 @@ abstract class ServiceAbstract implements ServiceInterface
     /**
      * Process html
      * @param string $html
+     * @param \DOMNode $container
      * @return string
      */
-    public function processHtml($html)
+    public function processHtml($html, \DOMNode $container = null)
     {
         $urlRegExpr = $this->getRegExpression();
         $linkRegexp = "/<a href=\"$urlRegExpr\">$urlRegExpr<\/a>/i";
 
         $document = new \DOMDocument();
-        $containerNode = $this->createDOMNode(
-            $document,
-            'div',
-            (array)$this->config('container_html_attr', [])
-        );
 
-        return preg_replace_callback($linkRegexp, function ($matches) use ($document, $containerNode) {
-            $frameNode = $this->getEmbedNode($matches);
-            if ($containerNode->hasChildNodes()) {
-                $containerNode->replaceChild($frameNode, $containerNode->firstChild);
+        if (!$container) {
+            $container = $document;
+        } else {
+            $container = $document->importNode($container);
+        }
+
+        return preg_replace_callback($linkRegexp, function ($matches) use ($document, $container) {
+            $frameNode = $document->importNode(
+                $this->getEmbedNode($matches),
+                true
+            );
+            if ($container->hasChildNodes()) {
+                $container->replaceChild($frameNode, $container->firstChild);
             } else {
-                $containerNode->appendChild($frameNode);
+                $container->appendChild($frameNode);
             }
 
             return html_entity_decode(
