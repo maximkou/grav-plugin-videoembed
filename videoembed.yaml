@@ -21,3 +21,16 @@ services:
             vq         : hd1080
             wmode      : opaque
             enablejsapi: 1
+    vimeo:
+        enabled: true
+        embed_html_attr:
+            frameborder: 0
+            width      : 560
+            height     : 315
+        embed_options:
+            autoplay   : 1
+            loop       : 0
+            color      : ffffff
+            byline:    : 1
+            portrait:  : 1
+            title:     : 1

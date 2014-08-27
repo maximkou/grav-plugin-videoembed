@@ -1,6 +1,7 @@
 Embed Video plugin for [Grav CMS](http://getgrav.org)
 -------------------------------------------------
 [![Build Status](https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v1.0)](https://travis-ci.org/maximkou/grav-plugin-videoembed)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/127bf39f-d49a-4c9b-965d-2eb97e384fe4/mini.png)](https://insight.sensiolabs.com/projects/127bf39f-d49a-4c9b-965d-2eb97e384fe4)
 
 This plugin converts video links to embed format.
 Supported services:
