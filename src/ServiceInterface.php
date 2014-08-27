@@ -22,4 +22,4 @@ interface ServiceInterface
      * @return \DOMNode
      */
     public function getEmbedNode(array $matches);
-} 
+}

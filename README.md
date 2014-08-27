@@ -1,9 +1,14 @@
 Embed Video plugin for [Grav CMS](http://getgrav.org)
 -------------------------------------------------
+[![Build Status](https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v0.1-alpha)](https://travis-ci.org/maximkou/grav-plugin-videoembed)
 
-This plugin convert links to videos from sharing services in page to embed format.
+This plugin converts video links to embed format.
+Supported services:
 
-## Example
+* Youtube
+* Vimeo (planned)
+
+## Working example
 
 This `.md` page source:
 ```
@@ -51,15 +56,24 @@ All configuration rules located in `videoembed.yaml`
 ```
 enabled: true
 
+# embed element container, if this section empty - not use container
+container:
+    element: div
+    # container element html attributes
+    html_attr:
+        class: video-container
+
+# supported services configs
 services:
     youtube:
+        # you can disable support 
         enabled: true
-        container_html_attr:
-            class: video-container
+        # embed element html attributes, for youtube element is iframe
         embed_html_attr:
             frameborder: 0
             width      : 560
             height     : 315
+        # options, which you will add for videos
         embed_options:
             autoplay   : 1
             autohide   : 1
@@ -69,6 +83,21 @@ services:
             vq         : hd1080
             wmode      : opaque
             enablejsapi: 1
+
+```
+
+### Customizing single video/page videos parameters
+If you need set custom plugin parameters for single page, set plugin parameters in page header in section `videoembed`, e.g:
+
+```
+---
+# ... more headers
+videoembed:
+    services:
+        youtube:
+            embed_options:
+                fs: 2
+---
 ```
 
 You can override default `embed_options` for each video, for do this simply add params to end of video url. Your params will be applied on default embed options.

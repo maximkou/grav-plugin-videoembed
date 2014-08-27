@@ -17,7 +17,7 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
 
         $page = $this->getMock(
             '\\Grav\\Common\\Page\\Page',
-            ['content'],
+            ['content', 'header'],
             [],
             '',
             false
@@ -26,6 +26,11 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
             ->method('content')
             ->willReturn(
                 $this->equalTo('testContent')
+            );
+        $page->expects($this->any())
+            ->method('header')
+            ->willReturn(
+                (object)[]
             );
 
         $event->expects($this->any())
@@ -45,20 +50,16 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
         $config->expects($this->at(0))
             ->method('get')
             ->with(
-                $this->equalTo('plugins.videoembed.container.element'),
+                $this->equalTo('plugins.videoembed'),
                 $this->anything(),
                 $this->anything()
             )
-            ->willReturn('div');
-
-        $config->expects($this->at(1))
-            ->method('get')
-            ->with(
-                $this->equalTo('plugins.videoembed.container.html_attr'),
-                $this->anything(),
-                $this->anything()
-            )
-            ->willReturn(['class' => 'container']);
+            ->willReturn([
+                'container' => [
+                    'element' => 'div',
+                    'html_attr' => ['class' => 'container']
+                ]
+            ]);
 
         $plugin = $this->getMock(
             '\\Grav\\Plugin\\VideoEmbedPlugin',
@@ -109,7 +110,9 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
         $data = [];
         /** @var $serviceFile \SplFileInfo */
         foreach (new \DirectoryIterator($dir) as $serviceFile) {
-            if ($serviceFile->isDot() || $serviceFile->isDir()) continue;
+            if ($serviceFile->isDot() || $serviceFile->isDir()) {
+                continue;
+            }
 
             $data[] = [preg_replace('/\.php$/', '', $serviceFile->getBasename()), true];
         }
@@ -127,8 +130,10 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn(
                 [
-                    'testService' => ['enabled' => true],
-                    'testServiceDisabled' => ['enabled' => false]
+                    'services' => [
+                        'testService' => ['enabled' => true],
+                        'testServiceDisabled' => ['enabled' => false]
+                    ]
                 ]
             );
 

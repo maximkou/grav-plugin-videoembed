@@ -15,6 +15,9 @@ use Grav\Component\EventDispatcher\Event;
  */
 class VideoEmbedPlugin extends Plugin
 {
+    /** @var \Grav\Common\Data\Data */
+    protected $cfg;
+
     /**
      * @return array
      */
@@ -31,17 +34,22 @@ class VideoEmbedPlugin extends Plugin
      */
     public function onPageProcessed(Event $event)
     {
+        require_once __DIR__ . "/src/ServiceInterface.php";
+        require_once __DIR__ . "/src/ServiceAbstract.php";
+
         /** @var \Grav\Common\Page\Page $page */
         $page = $event->offsetGet('page');
+        $headers = $page->header();
+        $this->initConfig(isset($headers->videoembed) ? $headers->videoembed : []);
 
         $content = $page->content();
         $services = $this->getEnabledServicesSettings();
 
         $container = null;
-        if ($cElem = $this->config->get('plugins.videoembed.container.element')) {
+        if ($cElem = $this->cfg->get('container.element')) {
             $document = new \DOMDocument();
             $container = $document->createElement($cElem);
-            $containerAttr = (array)$this->config->get('plugins.videoembed.container.html_attr', []);
+            $containerAttr = (array)$this->cfg->get('container.html_attr', []);
             foreach ($containerAttr as $htmlAttr => $attrValue) {
                 $container->setAttribute($htmlAttr, $attrValue);
             }
@@ -52,7 +60,10 @@ class VideoEmbedPlugin extends Plugin
             $content = $service->processHtml($content, $container);
         }
 
+        $isProcessMarkdown = $page->shouldProcess('markdown');
+        $page->process(['markdown' => false]);
         $page->content($content);
+        $page->process(['markdown' => $isProcessMarkdown]);
     }
 
     /**
@@ -61,9 +72,9 @@ class VideoEmbedPlugin extends Plugin
      */
     public function getEnabledServicesSettings()
     {
-        $services = (array)$this->config->get('plugins.videoembed.services');
+        $services = (array)$this->getConfig()->get('services');
 
-        return array_filter($services, function($config) {
+        return array_filter($services, function ($config) {
             return (!empty($config['enabled']) && $config['enabled']);
         });
     }
@@ -87,5 +98,54 @@ class VideoEmbedPlugin extends Plugin
         require_once $servicePath;
 
         return new $serviceClass($serviceConfig);
+    }
+
+    /**
+     * Merge options recursively
+     *
+     * @param  array $array1
+     * @param  mixed $array2
+     * @return array
+     */
+    protected function mergeOptions(array $array1, $array2 = null)
+    {
+        if (is_array($array2)) {
+            foreach ($array2 as $key => $val) {
+                if (is_array($array2[$key])) {
+                    $array1[$key] = (array_key_exists($key, $array1) && is_array($array1[$key]))
+                        ? $this->mergeOptions($array1[$key], $array2[$key])
+                        : $array2[$key];
+                } else {
+                    $array1[$key] = $val;
+                }
+            }
+        }
+        return $array1;
+    }
+
+    /**
+     * @return \Grav\Common\Data\Data
+     */
+    protected function getConfig()
+    {
+        if (!$this->cfg) {
+            return $this->initConfig();
+        }
+        return $this->cfg;
+    }
+
+    /**
+     * Init config anf merge this with user params
+     * @param array $userConfig
+     * @return \Grav\Common\Data\Data
+     */
+    protected function initConfig($userConfig = [])
+    {
+        $config = $this->mergeOptions(
+            (array)$this->config->get('plugins.videoembed', []),
+            $userConfig
+        );
+
+        return $this->cfg = new \Grav\Common\Data\Data($config);
     }
 }

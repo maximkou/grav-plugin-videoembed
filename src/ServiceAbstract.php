@@ -1,8 +1,6 @@
 <?php
 namespace Grav\Plugin\VideoEmbed;
 
-require_once __DIR__ . "/ServiceInterface.php";
-
 abstract class ServiceAbstract implements ServiceInterface
 {
     protected $config = [];

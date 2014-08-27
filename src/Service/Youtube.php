@@ -3,8 +3,6 @@ namespace Grav\Plugin\VideoEmbed\Service;
 
 use \Grav\Plugin\VideoEmbed\ServiceAbstract;
 
-require_once __DIR__ . "/../ServiceAbstract.php";
-
 class Youtube extends ServiceAbstract
 {
     /**

@@ -1,0 +1,15 @@
+language: php
+php:
+  - 5.6
+  - 5.5
+  - 5.4
+  - hhvm
+
+install:
+  - composer self-update
+  - composer install --dev --prefer-dist
+
+script:
+  - bin/phpunit --verbose
+  - php bin/phpcs --standard=PSR1 --ignore=vendor .
+  - php bin/phpcs --standard=PSR2 --ignore=vendor .
