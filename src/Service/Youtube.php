@@ -27,14 +27,12 @@ class Youtube extends ServiceAbstract
      */
     public function getRegExpression()
     {
-        // starts with scheme, www
-        $r = '(http|https)?(:)?(\/\/)?(www\.)?';
         // youtube valid hosts
-        $r .= '(youtube\.com|youtu\.be|youtube-nocookie\.com)\/';
+        $r = self::REGEXP_HTTP_SCHEME.'(youtube\.com|youtu\.be|youtube-nocookie\.com)\/';
         // video ID
         $r .= '(watch\?v=|v\/|u\/|embed\/?)?(videoseries\?list=(.*)|[\w-]{11}|\?listType=(.*)&list=(.*))';
         // more params
-        $r .= '([a-z0-9-._~:\/\?#\[\]@!$&\'()*\+,;\=]*)';
+        $r .= '('.self::REGEXP_ALLOWED_IN_URL.'*)';
 
         return $r;
     }
@@ -46,19 +44,10 @@ class Youtube extends ServiceAbstract
      */
     public function getEmbedNode(array $matches)
     {
-        $embedUrl = '//youtube.com/embed/'.$matches[7];
-        $userOpts = [];
-        if (!empty($matches[11])) {
-            parse_str(trim($matches[11], '?&'), $userOpts);
-        }
-        $userOpts = array_merge(
-            (array)$this->config('embed_options', []),
-            $userOpts
+        $embedUrl = $this->createStandardEmbedUrl(
+            '//youtube.com/embed/'.$matches[7],
+            !empty($matches[11]) ? $matches[11] : null
         );
-
-        if (!empty($userOpts)) {
-            $embedUrl .= '?'.http_build_query($userOpts);
-        }
 
         $this->embed->setAttribute('src', $embedUrl);
 

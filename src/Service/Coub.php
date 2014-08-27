@@ -3,7 +3,7 @@ namespace Grav\Plugin\VideoEmbed\Service;
 
 use Grav\Plugin\VideoEmbed\ServiceAbstract;
 
-class Vimeo extends ServiceAbstract
+class Coub extends ServiceAbstract
 {
     /**
      * @var \DOMNode
@@ -27,10 +27,10 @@ class Vimeo extends ServiceAbstract
      */
     public function getRegExpression()
     {
-        // vimeo valid hosts
-        $r = self::REGEXP_HTTP_SCHEME.'(player\.)?vimeo\.com\/';
+        // coub valid hosts
+        $r = self::REGEXP_HTTP_SCHEME.'coub\.com\/';
         // video ID
-        $r .= '(video\/)?(\d+)';
+        $r .= '(view|embed)\/([^\/\?\#]+)';
         // more params
         $r .= '('.self::REGEXP_ALLOWED_IN_URL.'*)';
 
@@ -45,8 +45,8 @@ class Vimeo extends ServiceAbstract
     public function getEmbedNode(array $matches)
     {
         $embedUrl = $this->createStandardEmbedUrl(
-            '//player.vimeo.com/video/'.$matches[7],
-            !empty($matches[8]) ? $matches[8] : null
+            'http://coub.com/embed/'.$matches[6],
+            !empty($matches[7]) ? $matches[7] : null
         );
 
         $this->embed->setAttribute('src', $embedUrl);

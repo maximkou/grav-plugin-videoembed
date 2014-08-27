@@ -3,6 +3,9 @@ namespace Grav\Plugin\VideoEmbed;
 
 abstract class ServiceAbstract implements ServiceInterface
 {
+    const REGEXP_HTTP_SCHEME = '(http|https)?(:)?(\/\/)?(www\.)?';
+    const REGEXP_ALLOWED_IN_URL = '[a-z0-9-._~:\/\?#\[\]@!$&\'()*\+,;\=]';
+
     protected $config = [];
 
     public function __construct(array $config = [])
@@ -94,5 +97,23 @@ abstract class ServiceAbstract implements ServiceInterface
         );
 
         return $node;
+    }
+
+    protected function createStandardEmbedUrl($embedUrl, $urlQuery)
+    {
+        $userOpts = [];
+        if (!empty($urlQuery)) {
+            parse_str(trim($urlQuery, '?&'), $userOpts);
+        }
+        $userOpts = array_merge(
+            (array)$this->config('embed_options', []),
+            $userOpts
+        );
+
+        if (!empty($userOpts)) {
+            $embedUrl .= '?'.http_build_query($userOpts);
+        }
+
+        return $embedUrl;
     }
 }

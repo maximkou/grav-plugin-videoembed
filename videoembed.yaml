@@ -34,3 +34,15 @@ services:
             byline     : 1
             portrait   : 1
             title      : 1
+    coub:
+        enabled: true
+        embed_html_attr:
+            frameborder: 0
+            width      : 560
+            height     : 315
+        embed_options:
+            muted         : false
+            autostart     : true
+            originalSize  : false
+            hideTopBar    : true
+            startWithHD   : true
