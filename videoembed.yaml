@@ -31,6 +31,6 @@ services:
             autoplay   : 1
             loop       : 0
             color      : ffffff
-            byline:    : 1
-            portrait:  : 1
-            title:     : 1
+            byline     : 1
+            portrait   : 1
+            title      : 1

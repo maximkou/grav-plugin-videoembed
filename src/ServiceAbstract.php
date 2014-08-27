@@ -30,6 +30,8 @@ abstract class ServiceAbstract implements ServiceInterface
         }
 
         return preg_replace_callback($linkRegexp, function ($matches) use ($document, $container) {
+            $matches = array_map('html_entity_decode', $matches);
+
             $frameNode = $document->importNode(
                 $this->getEmbedNode($matches),
                 true
@@ -40,9 +42,7 @@ abstract class ServiceAbstract implements ServiceInterface
                 $container->appendChild($frameNode);
             }
 
-            return html_entity_decode(
-                $document->saveHTML($frameNode->parentNode)
-            );
+            return $document->saveHTML($frameNode->parentNode);
         }, $html);
     }
 

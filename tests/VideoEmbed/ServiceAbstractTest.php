@@ -25,7 +25,7 @@ class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
             ->method('getEmbedNode')
             ->willReturn($div);
 
-        $result = $mock->processHtml($before, $container);
+        $result = html_entity_decode($mock->processHtml($before, $container));
         $this->assertEquals($expectedAfter, $result);
     }
 
