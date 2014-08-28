@@ -1,9 +1,9 @@
 <?php
 namespace Grav\Plugin\VideoEmbed\Service;
 
-use \Grav\Plugin\VideoEmbed\ServiceAbstract;
+use Grav\Plugin\VideoEmbed\ServiceAbstract;
 
-class Youtube extends ServiceAbstract
+class Vimeo extends ServiceAbstract
 {
     /**
      * Get regular expression, which take service url
@@ -11,10 +11,10 @@ class Youtube extends ServiceAbstract
      */
     public function getRegExpression()
     {
-        // youtube valid hosts
-        $r = self::REGEXP_HTTP_SCHEME.'(youtube\.com|youtu\.be|youtube-nocookie\.com)\/';
+        // vimeo valid hosts
+        $r = self::REGEXP_HTTP_SCHEME.'(player\.)?vimeo\.com\/';
         // video ID
-        $r .= '(watch\?v=|v\/|u\/|embed\/?)?(videoseries\?list=(.*)|[\w-]{11}|\?listType=(.*)&list=(.*))';
+        $r .= '(video\/)?(\d+)';
         // more params
         $r .= '('.self::REGEXP_ALLOWED_IN_URL.'*)';
 
@@ -29,8 +29,8 @@ class Youtube extends ServiceAbstract
     public function getEmbedNode(array $matches)
     {
         return $this->prepareStandardEmbed(
-            '//youtube.com/embed/'.$matches[7],
-            !empty($matches[11]) ? $matches[11] : null
+            '//player.vimeo.com/video/'.$matches[7],
+            !empty($matches[8]) ? $matches[8] : null
         );
     }
 }

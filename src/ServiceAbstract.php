@@ -3,11 +3,25 @@ namespace Grav\Plugin\VideoEmbed;
 
 abstract class ServiceAbstract implements ServiceInterface
 {
+    const REGEXP_HTTP_SCHEME = '(http|https)?(:)?(\/\/)?(www\.)?';
+    const REGEXP_ALLOWED_IN_URL = '[a-z0-9-._~:\/\?#\[\]@!$&\'()*\+,;\=]';
+
     protected $config = [];
+
+    /**
+     * @var \DOMNode
+     */
+    protected $embed;
 
     public function __construct(array $config = [])
     {
         $this->config = $config;
+
+        $this->embed = $this->createDOMNode(
+            new \DOMDocument(),
+            'iframe',
+            (array)$this->config('embed_html_attr', [])
+        );
     }
 
     /**
@@ -30,6 +44,8 @@ abstract class ServiceAbstract implements ServiceInterface
         }
 
         return preg_replace_callback($linkRegexp, function ($matches) use ($document, $container) {
+            $matches = array_map('html_entity_decode', $matches);
+
             $frameNode = $document->importNode(
                 $this->getEmbedNode($matches),
                 true
@@ -40,9 +56,7 @@ abstract class ServiceAbstract implements ServiceInterface
                 $container->appendChild($frameNode);
             }
 
-            return html_entity_decode(
-                $document->saveHTML($frameNode->parentNode)
-            );
+            return $document->saveHTML($frameNode->parentNode);
         }, $html);
     }
 
@@ -94,5 +108,25 @@ abstract class ServiceAbstract implements ServiceInterface
         );
 
         return $node;
+    }
+
+    protected function prepareStandardEmbed($embedUrl, $urlQuery)
+    {
+        $userOpts = [];
+        if (!empty($urlQuery)) {
+            parse_str(trim($urlQuery, '?&'), $userOpts);
+        }
+        $userOpts = array_merge(
+            (array)$this->config('embed_options', []),
+            $userOpts
+        );
+
+        if (!empty($userOpts)) {
+            $embedUrl .= '?'.http_build_query($userOpts);
+        }
+
+        $this->embed->setAttribute('src', $embedUrl);
+
+        return $this->embed;
     }
 }
