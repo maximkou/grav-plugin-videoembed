@@ -16,7 +16,9 @@ use Grav\Component\EventDispatcher\Event;
  */
 class VideoEmbedPlugin extends Plugin
 {
-    /** @var \Grav\Common\Data\Data */
+    /**
+     * @var \Grav\Common\Data\Data
+     */
     protected $cfg;
 
     /**
@@ -46,16 +48,7 @@ class VideoEmbedPlugin extends Plugin
         $content = $page->content();
         $services = $this->getEnabledServicesSettings();
 
-        $container = null;
-        if ($cElem = $this->cfg->get('container.element')) {
-            $document = new \DOMDocument();
-            $container = $document->createElement($cElem);
-            $containerAttr = (array)$this->cfg->get('container.html_attr', []);
-            foreach ($containerAttr as $htmlAttr => $attrValue) {
-                $container->setAttribute($htmlAttr, $attrValue);
-            }
-        }
-
+        $container = $this->getEmbedContainer();
         foreach ($services as $serviceName => $serviceConfig) {
             $service = $this->getServiceByName($serviceName, $serviceConfig);
             $content = $service->processHtml($content, $container);
@@ -148,5 +141,23 @@ class VideoEmbedPlugin extends Plugin
         );
 
         return $this->cfg = new \Grav\Common\Data\Data($config);
+    }
+
+    /**
+     * @return \DOMElement|null
+     */
+    protected function getEmbedContainer()
+    {
+        $container = null;
+        if ($cElem = $this->getConfig()->get('container.element')) {
+            $document = new \DOMDocument();
+            $container = $document->createElement($cElem);
+            $containerAttr = (array)$this->getConfig()->get('container.html_attr', []);
+            foreach ($containerAttr as $htmlAttr => $attrValue) {
+                $container->setAttribute($htmlAttr, $attrValue);
+            }
+        }
+
+        return $container;
     }
 }
