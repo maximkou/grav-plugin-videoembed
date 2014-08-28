@@ -6,22 +6,6 @@ use Grav\Plugin\VideoEmbed\ServiceAbstract;
 class Coub extends ServiceAbstract
 {
     /**
-     * @var \DOMNode
-     */
-    protected $embed;
-
-    public function __construct(array $config = [])
-    {
-        parent::__construct($config);
-
-        $this->embed = $this->createDOMNode(
-            new \DOMDocument(),
-            'iframe',
-            (array)$this->config('embed_html_attr', [])
-        );
-    }
-
-    /**
      * Get regular expression, which take service url
      * @return string
      */
@@ -44,13 +28,9 @@ class Coub extends ServiceAbstract
      */
     public function getEmbedNode(array $matches)
     {
-        $embedUrl = $this->createStandardEmbedUrl(
+        return $this->prepareStandardEmbed(
             'http://coub.com/embed/'.$matches[6],
             !empty($matches[7]) ? $matches[7] : null
         );
-
-        $this->embed->setAttribute('src', $embedUrl);
-
-        return $this->embed;
     }
 }

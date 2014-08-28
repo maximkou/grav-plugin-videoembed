@@ -7,7 +7,8 @@ This plugin converts video links to embed format.
 Supported services:
 
 * Youtube
-* Vimeo (planned)
+* Vimeo
+* Coub.com
 
 ## Working example
 

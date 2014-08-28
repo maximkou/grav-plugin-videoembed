@@ -6,22 +6,6 @@ use Grav\Plugin\VideoEmbed\ServiceAbstract;
 class Vimeo extends ServiceAbstract
 {
     /**
-     * @var \DOMNode
-     */
-    protected $embed;
-
-    public function __construct(array $config = [])
-    {
-        parent::__construct($config);
-
-        $this->embed = $this->createDOMNode(
-            new \DOMDocument(),
-            'iframe',
-            (array)$this->config('embed_html_attr', [])
-        );
-    }
-
-    /**
      * Get regular expression, which take service url
      * @return string
      */
@@ -44,13 +28,9 @@ class Vimeo extends ServiceAbstract
      */
     public function getEmbedNode(array $matches)
     {
-        $embedUrl = $this->createStandardEmbedUrl(
+        return $this->prepareStandardEmbed(
             '//player.vimeo.com/video/'.$matches[7],
             !empty($matches[8]) ? $matches[8] : null
         );
-
-        $this->embed->setAttribute('src', $embedUrl);
-
-        return $this->embed;
     }
 }

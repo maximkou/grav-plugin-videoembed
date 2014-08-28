@@ -8,9 +8,20 @@ abstract class ServiceAbstract implements ServiceInterface
 
     protected $config = [];
 
+    /**
+     * @var \DOMNode
+     */
+    protected $embed;
+
     public function __construct(array $config = [])
     {
         $this->config = $config;
+
+        $this->embed = $this->createDOMNode(
+            new \DOMDocument(),
+            'iframe',
+            (array)$this->config('embed_html_attr', [])
+        );
     }
 
     /**
@@ -99,7 +110,7 @@ abstract class ServiceAbstract implements ServiceInterface
         return $node;
     }
 
-    protected function createStandardEmbedUrl($embedUrl, $urlQuery)
+    protected function prepareStandardEmbed($embedUrl, $urlQuery)
     {
         $userOpts = [];
         if (!empty($urlQuery)) {
@@ -114,6 +125,8 @@ abstract class ServiceAbstract implements ServiceInterface
             $embedUrl .= '?'.http_build_query($userOpts);
         }
 
-        return $embedUrl;
+        $this->embed->setAttribute('src', $embedUrl);
+
+        return $this->embed;
     }
 }
