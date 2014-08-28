@@ -3,4 +3,5 @@
 tests/ export-ignore
 phpunit.xml.dist export-ignore
 composer.lock export-ignore
+composer.json export-ignore
 .travis.yml export-ignore
