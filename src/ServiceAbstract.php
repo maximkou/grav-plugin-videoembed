@@ -33,7 +33,7 @@ abstract class ServiceAbstract implements ServiceInterface
             // automatic add browser-specified allowfullscreen attributes
             $defaultHtmlAttributes = array_merge(
                 $defaultHtmlAttributes,
-                ['webkitallowfullscreen', 'mozallowfullscreen']
+                ['webkitallowfullscreen' => true, 'mozallowfullscreen' => true]
             );
         }
 
