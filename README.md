@@ -3,12 +3,12 @@ Embed Video plugin for [Grav CMS](http://getgrav.org)
 [![Build Status](https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v1.0)](https://travis-ci.org/maximkou/grav-plugin-videoembed)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/127bf39f-d49a-4c9b-965d-2eb97e384fe4/mini.png)](https://insight.sensiolabs.com/projects/127bf39f-d49a-4c9b-965d-2eb97e384fe4)
 
-This plugin converts video links to embed format.
-Supported services:
+This plugin convert links to videos from popular sharing services to embed format. Supported services:
 
 * Youtube
 * Vimeo
 * Coub.com
+* ... you can propose more services
 
 ## Working example
 
@@ -32,22 +32,20 @@ Will be converted to:
 
 
 ## Installation
-Simply add plugin dependency into `.dependencies` file, e.g:
+There are two ways to install plugin:
+
+1. Download the zip version of this repository and unzip it under `/your/site/grav/user/plugins`. Then, rename the folder to `videoembed`. 
+You should now have all the plugin files under `/your/site/grav/user/plugins/videoembed`
+
+2. Simply add plugin dependency into `.dependencies` file, e.g:
 ```
 git:
-    youtube:
+    videoembed:
         url: https://github.com/maximkou/grav-plugin-videoembed.git
         path: user/plugins/videoembed
         branch: master
-
-links:
-    youtube:
-        src: grav-plugin-videoembed
-        path: user/plugins/videoembed
-        scm: github
 ```
-
-And then run `php bin/grav install`. That's all!
+And then run `php bin/grav install`
 
 ## Configuration
 
@@ -85,6 +83,9 @@ services:
             vq         : hd1080
             wmode      : opaque
             enablejsapi: 1
+     vimeo:
+        # some config
+     ....
 
 ```
 
