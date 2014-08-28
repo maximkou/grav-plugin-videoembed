@@ -9,9 +9,10 @@ services:
     youtube:
         enabled: true
         embed_html_attr:
-            frameborder: 0
-            width      : 560
-            height     : 315
+            frameborder     : 0
+            width           : 560
+            height          : 315
+            allowfullscreen : true
         embed_options:
             autoplay   : 1
             autohide   : 1
@@ -24,11 +25,12 @@ services:
     vimeo:
         enabled: true
         embed_html_attr:
-            frameborder: 0
-            width      : 560
-            height     : 315
+            frameborder     : 0
+            width           : 560
+            height          : 315
+            allowfullscreen : true
         embed_options:
-            autoplay   : 1
+            autoplay   : 0
             loop       : 0
             color      : ffffff
             byline     : 1
@@ -37,12 +39,13 @@ services:
     coub:
         enabled: true
         embed_html_attr:
-            frameborder: 0
-            width      : 560
-            height     : 315
+            frameborder     : 0
+            width           : 560
+            height          : 315
+            allowfullscreen : true
         embed_options:
-            muted         : false
-            autostart     : true
-            originalSize  : false
-            hideTopBar    : true
-            startWithHD   : true
+            muted         : 'false'
+            autostart     : 'false'
+            originalSize  : 'false'
+            hideTopBar    : 'true'
+            startWithHD   : 'true'

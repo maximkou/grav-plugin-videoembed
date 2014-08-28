@@ -9,6 +9,7 @@ use Grav\Component\EventDispatcher\Event;
  * This plugin replace links to youtube and replace it with embed element
  * @package Grav\Plugin
  * @author Maxim Hodyrev <maximkou@gmail.com>
+ * @license MIT
  *
  * @property $grav \Grav\Common\Grav
  * @property $config \Grav\Common\Config

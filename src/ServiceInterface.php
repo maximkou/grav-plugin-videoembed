@@ -1,6 +1,12 @@
 <?php
 namespace Grav\Plugin\VideoEmbed;
 
+/**
+ * Interface ServiceInterface
+ * @package Grav\Plugin\VideoEmbed
+ * @author Maxim Hodyrev <maximkou@gmail.com>
+ * @license MIT
+ */
 interface ServiceInterface
 {
     /**

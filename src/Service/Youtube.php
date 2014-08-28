@@ -3,6 +3,12 @@ namespace Grav\Plugin\VideoEmbed\Service;
 
 use \Grav\Plugin\VideoEmbed\ServiceAbstract;
 
+/**
+ * Class Youtube
+ * @package Grav\Plugin\VideoEmbed\Service
+ * @author Maxim Hodyrev <maximkou@gmail.com>
+ * @license MIT
+ */
 class Youtube extends ServiceAbstract
 {
     /**

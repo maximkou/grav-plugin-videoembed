@@ -1,12 +1,23 @@
 <?php
 namespace Grav\Plugin\VideoEmbed;
 
+use Grav\Common\Data\Data;
+
+/**
+ * Class ServiceAbstract
+ * @package Grav\Plugin\VideoEmbed
+ * @author Maxim Hodyrev <maximkou@gmail.com>
+ * @license MIT
+ */
 abstract class ServiceAbstract implements ServiceInterface
 {
     const REGEXP_HTTP_SCHEME = '(http|https)?(:)?(\/\/)?(www\.)?';
     const REGEXP_ALLOWED_IN_URL = '[a-z0-9-._~:\/\?#\[\]@!$&\'()*\+,;\=]';
 
-    protected $config = [];
+    /**
+     * @var \Grav\Common\Data\Data
+     */
+    protected $config;
 
     /**
      * @var \DOMNode
@@ -15,12 +26,21 @@ abstract class ServiceAbstract implements ServiceInterface
 
     public function __construct(array $config = [])
     {
-        $this->config = $config;
+        $this->config = new Data($config);
+        $defaultHtmlAttributes = (array)$this->config->get('embed_html_attr', []);
+
+        if ($this->config->get('embed_html_attr.allowfullscreen', false)) {
+            // automatic add browser-specified allowfullscreen attributes
+            $defaultHtmlAttributes = array_merge(
+                $defaultHtmlAttributes,
+                ['webkitallowfullscreen', 'mozallowfullscreen']
+            );
+        }
 
         $this->embed = $this->createDOMNode(
             new \DOMDocument(),
             'iframe',
-            (array)$this->config('embed_html_attr', [])
+            $defaultHtmlAttributes
         );
     }
 
@@ -58,21 +78,6 @@ abstract class ServiceAbstract implements ServiceInterface
 
             return $document->saveHTML($frameNode->parentNode);
         }, $html);
-    }
-
-    /**
-     * Service specific config
-     * @param $item
-     * @param null $default
-     * @return null
-     */
-    protected function config($item, $default = null)
-    {
-        if (empty($this->config[$item])) {
-            return $default;
-        }
-
-        return $this->config[$item];
     }
 
     /**
@@ -117,7 +122,7 @@ abstract class ServiceAbstract implements ServiceInterface
             parse_str(trim($urlQuery, '?&'), $userOpts);
         }
         $userOpts = array_merge(
-            (array)$this->config('embed_options', []),
+            (array)$this->config->get('embed_options', []),
             $userOpts
         );
 

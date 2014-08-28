@@ -3,6 +3,12 @@ namespace Grav\Plugin\VideoEmbed\Service;
 
 use Grav\Plugin\VideoEmbed\ServiceAbstract;
 
+/**
+ * Class Coub
+ * @package Grav\Plugin\VideoEmbed\Service
+ * @author Maxim Hodyrev <maximkou@gmail.com>
+ * @license MIT
+ */
 class Coub extends ServiceAbstract
 {
     /**
