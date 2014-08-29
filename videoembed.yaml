@@ -1,5 +1,6 @@
 enabled: true
 
+responsive: true
 container:
     element: div
     html_attr:
