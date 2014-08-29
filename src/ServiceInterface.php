@@ -25,7 +25,7 @@ interface ServiceInterface
     /**
      * Get embed node for replace link
      * @param $matches array
-     * @return \DOMNode
+     * @return \DOMNode|\DOMNode[]
      */
-    public function getEmbedNode(array $matches);
+    public function getEmbedNodes(array $matches);
 }

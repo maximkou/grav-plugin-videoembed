@@ -32,7 +32,7 @@ class Coub extends ServiceAbstract
      * @param $matches array
      * @return \DOMNode
      */
-    public function getEmbedNode(array $matches)
+    public function getEmbedNodes(array $matches)
     {
         return $this->prepareStandardEmbed(
             'http://coub.com/embed/'.$matches[6],

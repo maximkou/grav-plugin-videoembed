@@ -30,7 +30,7 @@ class YoutubeTest extends \PHPUnit_Framework_TestCase
         ];
         $y = new Youtube($options);
 
-        $node = $y->getEmbedNode($matches);
+        $node = $y->getEmbedNodes($matches);
 
         $uOpts = [];
         if (!empty($matches[11])) {

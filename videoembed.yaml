@@ -50,3 +50,13 @@ services:
             originalSize  : 'false'
             hideTopBar    : 'true'
             startWithHD   : 'true'
+    # disabled by default
+    vine:
+        enabled: false
+        embed_html_attr:
+            class:          : 'vine-embed'
+            frameborder     : 0
+            width           : 560
+            height          : 315
+        embed_options:
+            audio: 1

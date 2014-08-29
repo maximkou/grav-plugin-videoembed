@@ -32,7 +32,7 @@ class Youtube extends ServiceAbstract
      * @param $matches array
      * @return \DOMNode
      */
-    public function getEmbedNode(array $matches)
+    public function getEmbedNodes(array $matches)
     {
         return $this->prepareStandardEmbed(
             '//youtube.com/embed/'.$matches[7],

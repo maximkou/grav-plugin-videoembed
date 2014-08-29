@@ -32,7 +32,7 @@ class Vimeo extends ServiceAbstract
      * @param $matches array
      * @return \DOMNode
      */
-    public function getEmbedNode(array $matches)
+    public function getEmbedNodes(array $matches)
     {
         return $this->prepareStandardEmbed(
             '//player.vimeo.com/video/'.$matches[7],

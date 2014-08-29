@@ -9,7 +9,7 @@ class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
     public function testProcessHtml($config, $container, $before, $expectedAfter)
     {
         $mock = $this->getMockBuilder('\\Grav\\Plugin\\VideoEmbed\\ServiceAbstract')
-            ->setMethods(['getEmbedNode', 'getRegExpression'])
+            ->setMethods(['getEmbedNodes', 'getRegExpression'])
             ->setConstructorArgs([ $config ])
             ->getMockForAbstractClass();
 
@@ -22,7 +22,7 @@ class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
         $doc = new \DOMDocument();
         $div = $doc->createElement('div', 'testOK');
         $mock->expects($this->any())
-            ->method('getEmbedNode')
+            ->method('getEmbedNodes')
             ->willReturn($div);
 
         $result = html_entity_decode($mock->processHtml($before, $container));
