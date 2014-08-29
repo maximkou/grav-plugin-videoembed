@@ -37,8 +37,9 @@ services:
             byline     : 1
             portrait   : 1
             title      : 1
+    # disabled by default
     coub:
-        enabled: true
+        enabled: false
         embed_html_attr:
             frameborder     : 0
             width           : 560
@@ -50,7 +51,6 @@ services:
             originalSize  : 'false'
             hideTopBar    : 'true'
             startWithHD   : 'true'
-    # disabled by default
     vine:
         enabled: false
         embed_html_attr:
@@ -59,4 +59,14 @@ services:
             width           : 560
             height          : 315
         embed_options:
-            audio: 1
+            audio : 1
+            type  : 'simple'
+    vk:
+        enabled: false
+        embed_html_attr:
+            frameborder     : 0
+            width           : 560
+            height          : 315
+        embed_options:
+            sd: 1
+            type  : 'simple'
