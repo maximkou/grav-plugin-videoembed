@@ -8,7 +8,7 @@ This plugin convert links to videos from popular sharing services to embed forma
 * Youtube
 * Vimeo
 * Coub.com
-* ... you can propose more services
+* ... you can propose more services [here](https://github.com/maximkou/grav-plugin-videoembed/issues)
 
 ## Working example
 
@@ -55,6 +55,9 @@ All configuration rules located in `videoembed.yaml`
 
 ```
 enabled: true
+
+# responsive video size
+responsive: false
 
 # embed element container, if this section empty - not use container
 container:
@@ -116,6 +119,13 @@ will be converted to something like this:
 	<iframe src="//youtube.com/embed/AsdjHDHksdf?autoplay=0&rel=0&hd=1&vq=hd1080&wmode=transparent"></iframe>
 </div>
 ```
+
+### Responsive video size
+If you want to have responsive video size, set `responsive` option to `true`.
+This option add responsiveness support(in 16:9 ratio) by using [this method for iframes](http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php).
+If this option enabled, plugin add `plugin-videoembed-container-fluid` class for container.
+
+**Attention:** this option requires defined `container.element` option. If option is not defined - you got plugin error. Disable responsiveness, if you want not use video wrapper.
 
 ## License
 The MIT License (MIT)

@@ -12,9 +12,6 @@ class YoutubeTest extends \PHPUnit_Framework_TestCase
     {
         $options = [
             'enabled' => true,
-            'container_html_attr' => [
-                'class' => 'video-container'
-            ],
             'embed_html_attr' => [
                 'frameborder'=> 0,
                 'width'      => 560,
