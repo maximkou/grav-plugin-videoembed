@@ -5,7 +5,9 @@
         "This file is @generated automatically"
     ],
     "hash": "acb503d2507f3f3e202ebc152e059e5d",
-    "packages": [],
+    "packages": [
+
+    ],
     "packages-dev": [
         {
             "name": "doctrine/cache",
@@ -1356,16 +1358,16 @@
         },
         {
             "name": "tracy/tracy",
-            "version": "v2.2.2",
+            "version": "v2.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/tracy.git",
-                "reference": "f5a2647c9d0174d218d626eab3952ea3a523c6e7"
+                "reference": "97889d2b8cfb7607cc370ca0ddb97c6f5b43deb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/tracy/zipball/f5a2647c9d0174d218d626eab3952ea3a523c6e7",
-                "reference": "f5a2647c9d0174d218d626eab3952ea3a523c6e7",
+                "url": "https://api.github.com/repos/nette/tracy/zipball/97889d2b8cfb7607cc370ca0ddb97c6f5b43deb9",
+                "reference": "97889d2b8cfb7607cc370ca0ddb97c6f5b43deb9",
                 "shasum": ""
             },
             "require": {
@@ -1406,7 +1408,7 @@
                 "debugger",
                 "nette"
             ],
-            "time": "2014-06-24 01:18:03"
+            "time": "2014-08-24 23:36:30"
         },
         {
             "name": "twig/twig",
@@ -1466,7 +1468,9 @@
             "time": "2014-07-05 12:19:05"
         }
     ],
-    "aliases": [],
+    "aliases": [
+
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "erusev/parsedown-extra": 20,
@@ -1474,6 +1478,10 @@
         "getgrav/grav": 20
     },
     "prefer-stable": false,
-    "platform": [],
-    "platform-dev": []
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
 }

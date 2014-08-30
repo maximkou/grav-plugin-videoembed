@@ -47,7 +47,8 @@ class Vine extends ServiceAbstract
         $nodes = [];
         $nodes[] = $iFrame = $this->prepareStandardEmbed(
             'https://vine.co/v/'.$matches[5].'/embed/'.$type,
-            !empty($matches[8]) ? $matches[8] : null
+            !empty($matches[8]) ? $matches[8] : null,
+            ['type']
         );
         $nodes[] = $script = $iFrame->ownerDocument->createElement('script');
         $script->setAttribute('async', true);
