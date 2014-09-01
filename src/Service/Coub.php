@@ -12,7 +12,7 @@ use Grav\Plugin\VideoEmbed\ServiceAbstract;
 class Coub extends ServiceAbstract
 {
     /**
-     * Get regular expression, which take service url
+     * Get regular expression, which take Coub video url
      * @return string
      */
     public function getRegExpression()

@@ -20,7 +20,7 @@ abstract class ServiceAbstract implements ServiceInterface
     protected $config;
 
     /**
-     * @var \DOMNode
+     * @var \DOMElement
      */
     protected $embed;
 

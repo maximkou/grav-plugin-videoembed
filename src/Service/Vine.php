@@ -12,7 +12,7 @@ use Grav\Plugin\VideoEmbed\ServiceAbstract;
 class Vine extends ServiceAbstract
 {
     /**
-     * Get regular expression, which take service url
+     * Get regular expression, which take Vine.co video url
      * @return string
      */
     public function getRegExpression()

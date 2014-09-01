@@ -12,7 +12,7 @@ use Grav\Plugin\VideoEmbed\ServiceAbstract;
 class Vk extends ServiceAbstract
 {
     /**
-     * Get regular expression, which take service url
+     * Get regular expression, which take Vk.com's video url
      * @return string
      */
     public function getRegExpression()
