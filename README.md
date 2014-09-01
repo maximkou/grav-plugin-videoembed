@@ -10,6 +10,7 @@ This plugin convert links to videos from popular sharing services to embed forma
 * Youtube
 * Vimeo
 * Coub.com
+* Vine.co
 * ... you can propose more services [here](https://github.com/maximkou/grav-plugin-videoembed/issues)
 
 ## Working example

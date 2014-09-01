@@ -61,12 +61,3 @@ services:
         embed_options:
             audio : 1
             type  : 'simple'
-    vk:
-        enabled: false
-        embed_html_attr:
-            frameborder     : 0
-            width           : 560
-            height          : 315
-        embed_options:
-            sd: 1
-            type  : 'simple'
