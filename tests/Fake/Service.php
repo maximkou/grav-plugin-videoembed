@@ -33,7 +33,7 @@ class Service implements ServiceInterface
      * @param $matches array
      * @return \DOMNode
      */
-    public function getEmbedNode(array $matches)
+    public function getEmbedNodes(array $matches)
     {
         // TODO: Implement getEmbedNode() method.
     }

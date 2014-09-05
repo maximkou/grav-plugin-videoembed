@@ -23,15 +23,52 @@ class VideoEmbedPlugin extends Plugin
 
     /**
      * @return array
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents()
     {
         return [
+            'onPageInitialized' => ['onPageInitialized', 0],
             'onPageProcessed' => ['onPageProcessed', 0],
         ];
     }
 
     /**
+     * If in page headers defined responsive option
+     * or global config require responsiveness
+     * enable adding responsive css
+     * @return void
+     */
+    public function onPageInitialized()
+    {
+        /** @var \Grav\Common\Page\Page $page */
+        $page = $this->grav['page'];
+
+        $headerResponsive = $page->value('header.videoembed.responsive', null);
+        $defaultsResponsive = $this->config->get('plugins.videoembed.responsive');
+        if (
+            ($page && $headerResponsive) ||
+            ($headerResponsive === null && $defaultsResponsive)
+        ) {
+            $this->enable([
+                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            ]);
+        }
+    }
+
+    /**
+     * Add styles for video responsiveness
+     * @see onPageInitialized
+     * @return void
+     * @codeCoverageIgnore
+     */
+    public function onTwigSiteVariables()
+    {
+        $this->grav['assets']->add('plugin://videoembed/css/videombed-responsive.css');
+    }
+
+    /**
+     * Process links in page
      * @param Event $event
      * @throws \Exception
      */
@@ -100,6 +137,7 @@ class VideoEmbedPlugin extends Plugin
      * @param  array $array1
      * @param  mixed $array2
      * @return array
+     * @codeCoverageIgnore
      */
     protected function mergeOptions(array $array1, $array2 = null)
     {
@@ -119,6 +157,7 @@ class VideoEmbedPlugin extends Plugin
 
     /**
      * @return \Grav\Common\Data\Data
+     * @codeCoverageIgnore
      */
     protected function getConfig()
     {
@@ -129,9 +168,10 @@ class VideoEmbedPlugin extends Plugin
     }
 
     /**
-     * Init config anf merge this with user params
+     * Init config and merge this with user params
      * @param array $userConfig
      * @return \Grav\Common\Data\Data
+     * @throws \ErrorException
      */
     protected function initConfig($userConfig = [])
     {
@@ -140,7 +180,34 @@ class VideoEmbedPlugin extends Plugin
             $userConfig
         );
 
-        return $this->cfg = new \Grav\Common\Data\Data($config);
+        $this->cfg = new \Grav\Common\Data\Data($config);
+
+        /**
+         * if you enable responsiveness, you need use some container for video
+         * @see http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php
+         */
+        if (!$this->cfg->get('container.element') && $this->cfg->get('responsive', false)) {
+            throw new \ErrorException(
+                '"Responsive" option requires using some container for video.
+                Please, set "container.element" option or disable responsiveness.'
+            );
+        }
+
+        if ($this->cfg->get('responsive', false)) {
+            $containerClasses = explode(' ', $this->cfg->get('container.html_attr.class', ''));
+            $containerClasses = array_map('trim', $containerClasses);
+            $fluidClass = 'plugin-videoembed-container-fluid';
+
+            if (!in_array($fluidClass, $containerClasses)) {
+                $containerClasses[] = $fluidClass;
+                $this->cfg->set(
+                    'container.html_attr.class',
+                    implode(' ', $containerClasses)
+                );
+            }
+        }
+
+        return $this->cfg;
     }
 
     /**

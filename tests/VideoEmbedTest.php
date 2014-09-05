@@ -8,6 +8,52 @@ namespace Grav\Plugin\VideoEmbed\Tests;
  */
 class VideoEmbedTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = '\\Grav\\Plugin\\VideoEmbedPlugin';
+
+    /**
+     * @dataProvider dpOnPageInitialized
+     */
+    public function testOnPageInitialized($isResponsiveConfig, $isResponsiveHeader)
+    {
+        $pageMock = $this->getMockBuilder('\\Grav\\Common\\Page\\Page')
+            ->setMethods(['value'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $pageMock->expects($this->any())
+            ->method('value')
+            ->with($this->equalTo('header.videoembed.responsive'))
+            ->willReturn($isResponsiveHeader);
+
+        $config = $this->getMock('\\Grav\Common\\Config', ['get'], [], '', false);
+        $config->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('plugins.videoembed.responsive'))
+            ->willReturn($isResponsiveConfig);
+
+        $grav = $this->getMock('\\Grav\Common\\Grav', null, [], '', false);
+        $grav->offsetSet('page', $pageMock);
+
+        $plugin = $this->getMock(
+            '\\Grav\\Plugin\\VideoEmbedPlugin',
+            ['enable'],
+            [$grav, $config]
+        );
+
+        if (
+            ($isResponsiveConfig === true && $isResponsiveHeader === null)
+            || $isResponsiveHeader === true
+        ) {
+            $plugin->expects($this->once())
+                ->method('enable')
+                ->with(
+                    $this->arrayHasKey('onTwigSiteVariables')
+                );
+        }
+
+        $plugin->onPageInitialized();
+    }
+
     public function testOnPageProcessed()
     {
         $event = $this->getMock(
@@ -103,6 +149,59 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider dpInitConfig
+     */
+    public function testInitConfig(array $globalConfig, array $userConfig)
+    {
+        $optionsMerge = new \ReflectionMethod(self::CLASS_NAME, 'mergeOptions');
+        $optionsMerge->setAccessible(true);
+
+        $config = $this->getMock('\\Grav\Common\\Config', ['get'], [], '', false);
+        $config->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('plugins.videoembed'))
+            ->willReturn($globalConfig);
+
+
+        $grav = $this->getMock('\\Grav\Common\\Grav', null, [], '', false);
+
+        $plugin = $this->getMock(
+            '\\Grav\\Plugin\\VideoEmbedPlugin',
+            ['enable'],
+            [$grav, $config]
+        );
+        $methodReflection = new \ReflectionMethod(self::CLASS_NAME, 'initConfig');
+        $methodReflection->setAccessible(true);
+
+        $opts = $optionsMerge->invoke($plugin, $globalConfig, $userConfig);
+        $opts = new \Grav\Common\Data\Data($opts);
+
+        if ($isErrorExpected = (!$opts->get('container.element') && $opts->get('responsive', false))) {
+            $this->setExpectedException('\ErrorException');
+        }
+
+        $resultCfg = $methodReflection->invoke($plugin, $userConfig);
+        if (!$isErrorExpected && $opts->get('responsive', false)) {
+            $this->assertContains(
+                'plugin-videoembed-container-fluid',
+                $resultCfg->get('container.html_attr.class')
+            );
+        }
+    }
+
+    public function dpOnPageInitialized()
+    {
+        return [
+            [false, true],
+            [false, null],
+            [false, false],
+            [true, true],
+            [true, null],
+            [true, false]
+        ];
+    }
+
     public function dpGetServiceByName()
     {
         $dir = __DIR__.'/../src/Service';
@@ -120,6 +219,41 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
         $data[] = ['unexistService', false];
 
         return $data;
+    }
+
+    public function dpInitConfig()
+    {
+        return [
+            [
+                [
+                    'container' => [
+                        'element' => false
+                    ],
+                    'responsive' => false
+                ],
+                [
+                    'responsive' => true
+                ]
+            ],
+            [
+                [
+                    'container' => [
+                        'element' => false
+                    ],
+                    'responsive' => false
+                ],
+                []
+            ],
+            [
+                [
+                    'container' => [
+                        'element' => 'div'
+                    ],
+                    'responsive' => true
+                ],
+                []
+            ]
+        ];
     }
 
     protected function getPluginMock()

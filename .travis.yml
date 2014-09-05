@@ -10,6 +10,10 @@ install:
   - composer install --dev --prefer-dist
 
 script:
-  - bin/phpunit --verbose
+  - bin/phpunit --verbose --coverage-clover=coverage.clover
   - php bin/phpcs --standard=PSR1 --ignore=vendor .
   - php bin/phpcs --standard=PSR2 --ignore=vendor .
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover

@@ -1,23 +1,23 @@
 <?php
 namespace Grav\Plugin\VideoEmbed\Tests\VideoEmbed\Service;
 
-class YoutubeTest extends AbstractServiceTest
+class CoubTest extends AbstractServiceTest
 {
     public function getPluginName()
     {
-        return 'Youtube';
+        return 'Coub';
     }
 
     public function getVideoUrl($videoId, $urlQuery = null)
     {
-        return '//youtube.com/embed/'.$videoId;
+        return 'http://coub.com/embed/'.$videoId;
     }
 
     public function createMatchesArray($videoId, $urlQuery = null)
     {
         return [
-            7 => $videoId,
-            11 => $urlQuery
+            6 => $videoId,
+            7 => $urlQuery
         ];
     }
 }

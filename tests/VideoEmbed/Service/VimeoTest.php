@@ -1,23 +1,23 @@
 <?php
 namespace Grav\Plugin\VideoEmbed\Tests\VideoEmbed\Service;
 
-class YoutubeTest extends AbstractServiceTest
+class VimeoTest extends AbstractServiceTest
 {
     public function getPluginName()
     {
-        return 'Youtube';
+        return 'Vimeo';
     }
 
     public function getVideoUrl($videoId, $urlQuery = null)
     {
-        return '//youtube.com/embed/'.$videoId;
+        return '//player.vimeo.com/video/'.$videoId;
     }
 
     public function createMatchesArray($videoId, $urlQuery = null)
     {
         return [
             7 => $videoId,
-            11 => $urlQuery
+            8 => $urlQuery
         ];
     }
 }

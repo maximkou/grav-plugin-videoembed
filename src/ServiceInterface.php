@@ -6,6 +6,7 @@ namespace Grav\Plugin\VideoEmbed;
  * @package Grav\Plugin\VideoEmbed
  * @author Maxim Hodyrev <maximkou@gmail.com>
  * @license MIT
+ * @codeCoverageIgnore
  */
 interface ServiceInterface
 {
@@ -25,7 +26,7 @@ interface ServiceInterface
     /**
      * Get embed node for replace link
      * @param $matches array
-     * @return \DOMNode
+     * @return \DOMNode|\DOMNode[]
      */
-    public function getEmbedNode(array $matches);
+    public function getEmbedNodes(array $matches);
 }

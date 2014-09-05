@@ -12,8 +12,9 @@ use \Grav\Plugin\VideoEmbed\ServiceAbstract;
 class Youtube extends ServiceAbstract
 {
     /**
-     * Get regular expression, which take service url
+     * Get regular expression, which take Youtube video url
      * @return string
+     * @codeCoverageIgnore
      */
     public function getRegExpression()
     {
@@ -32,7 +33,7 @@ class Youtube extends ServiceAbstract
      * @param $matches array
      * @return \DOMNode
      */
-    public function getEmbedNode(array $matches)
+    public function getEmbedNodes(array $matches)
     {
         return $this->prepareStandardEmbed(
             '//youtube.com/embed/'.$matches[7],

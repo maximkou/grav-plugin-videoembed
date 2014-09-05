@@ -20,7 +20,7 @@ abstract class ServiceAbstract implements ServiceInterface
     protected $config;
 
     /**
-     * @var \DOMNode
+     * @var \DOMElement
      */
     protected $embed;
 
@@ -66,17 +66,22 @@ abstract class ServiceAbstract implements ServiceInterface
         return preg_replace_callback($linkRegexp, function ($matches) use ($document, $container) {
             $matches = array_map('html_entity_decode', $matches);
 
-            $frameNode = $document->importNode(
-                $this->getEmbedNode($matches),
-                true
-            );
-            if ($container->hasChildNodes()) {
-                $container->replaceChild($frameNode, $container->firstChild);
-            } else {
-                $container->appendChild($frameNode);
+            while ($container->hasChildNodes()) {
+                $container->removeChild($container->firstChild);
             }
 
-            return $document->saveHTML($frameNode->parentNode);
+            $embedNodes = $this->getEmbedNodes($matches);
+            if (!is_array($embedNodes)) {
+                $embedNodes = [$embedNodes];
+            }
+
+            foreach ($embedNodes as $embedNode) {
+                $container->appendChild(
+                    $document->importNode($embedNode, true)
+                );
+            }
+
+            return $document->saveHTML($container);
         }, $html);
     }
 
@@ -85,6 +90,7 @@ abstract class ServiceAbstract implements ServiceInterface
      * @param $setter \Callable
      * @param array $attributes
      * @throws \InvalidArgumentException
+     * @codeCoverageIgnore
      */
     protected function batchSetAttributes($setter, array $attributes)
     {
@@ -103,6 +109,7 @@ abstract class ServiceAbstract implements ServiceInterface
      * @param $name string dom node name
      * @param array $attributes
      * @return \DOMElement
+     * @codeCoverageIgnore
      */
     protected function createDOMNode(\DOMDocument $doc, $name, array $attributes = [])
     {
@@ -115,7 +122,7 @@ abstract class ServiceAbstract implements ServiceInterface
         return $node;
     }
 
-    protected function prepareStandardEmbed($embedUrl, $urlQuery)
+    protected function prepareStandardEmbed($embedUrl, $urlQuery, array $ignore = [])
     {
         $userOpts = [];
         if (!empty($urlQuery)) {
@@ -124,6 +131,11 @@ abstract class ServiceAbstract implements ServiceInterface
         $userOpts = array_merge(
             (array)$this->config->get('embed_options', []),
             $userOpts
+        );
+
+        $userOpts = array_diff_key(
+            $userOpts,
+            array_flip($ignore)
         );
 
         if (!empty($userOpts)) {
