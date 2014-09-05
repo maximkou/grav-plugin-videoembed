@@ -1,6 +1,6 @@
 enabled: true
 
-responsive: true
+responsive: false
 container:
     element: div
     html_attr:
@@ -37,9 +37,8 @@ services:
             byline     : 1
             portrait   : 1
             title      : 1
-    # disabled by default
     coub:
-        enabled: false
+        enabled: true
         embed_html_attr:
             frameborder     : 0
             width           : 560
@@ -52,7 +51,7 @@ services:
             hideTopBar    : 'true'
             startWithHD   : 'true'
     vine:
-        enabled: false
+        enabled: true
         embed_html_attr:
             class:          : 'vine-embed'
             frameborder     : 0
