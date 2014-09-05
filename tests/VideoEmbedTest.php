@@ -184,7 +184,8 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
         $resultCfg = $methodReflection->invoke($plugin, $userConfig);
         if (!$isErrorExpected && $opts->get('responsive', false)) {
             $this->assertContains(
-                'plugin-videoembed-container-fluid', $resultCfg->get('container.html_attr.class')
+                'plugin-videoembed-container-fluid',
+                $resultCfg->get('container.html_attr.class')
             );
         }
     }
