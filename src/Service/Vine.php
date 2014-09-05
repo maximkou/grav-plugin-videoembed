@@ -14,6 +14,7 @@ class Vine extends ServiceAbstract
     /**
      * Get regular expression, which take Vine.co video url
      * @return string
+     * @codeCoverageIgnore
      */
     public function getRegExpression()
     {

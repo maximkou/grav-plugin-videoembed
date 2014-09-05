@@ -90,6 +90,7 @@ abstract class ServiceAbstract implements ServiceInterface
      * @param $setter \Callable
      * @param array $attributes
      * @throws \InvalidArgumentException
+     * @codeCoverageIgnore
      */
     protected function batchSetAttributes($setter, array $attributes)
     {
@@ -108,6 +109,7 @@ abstract class ServiceAbstract implements ServiceInterface
      * @param $name string dom node name
      * @param array $attributes
      * @return \DOMElement
+     * @codeCoverageIgnore
      */
     protected function createDOMNode(\DOMDocument $doc, $name, array $attributes = [])
     {

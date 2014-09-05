@@ -14,6 +14,7 @@ class Coub extends ServiceAbstract
     /**
      * Get regular expression, which take Coub video url
      * @return string
+     * @codeCoverageIgnore
      */
     public function getRegExpression()
     {

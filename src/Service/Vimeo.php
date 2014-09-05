@@ -14,6 +14,7 @@ class Vimeo extends ServiceAbstract
     /**
      * Get regular expression, which take Vimeo video url
      * @return string
+     * @codeCoverageIgnore
      */
     public function getRegExpression()
     {

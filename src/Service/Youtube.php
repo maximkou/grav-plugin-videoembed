@@ -14,6 +14,7 @@ class Youtube extends ServiceAbstract
     /**
      * Get regular expression, which take Youtube video url
      * @return string
+     * @codeCoverageIgnore
      */
     public function getRegExpression()
     {

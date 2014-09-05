@@ -3,12 +3,51 @@ namespace Grav\Plugin\VideoEmbed\Tests\VideoEmbed;
 
 class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
 {
+    const CLASS_NAME = '\\Grav\\Plugin\\VideoEmbed\\ServiceAbstract';
+    /**
+     * @dataProvider dpConstruct
+     */
+    public function testConstruct(array $config)
+    {
+        $mock = $this->getMockBuilder(self::CLASS_NAME)
+            ->setMethods(['createDOMNode'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        if (empty($config['embed_html_attr'])) {
+            $config['embed_html_attr'] = [];
+        }
+
+        if (
+            !empty($config['embed_html_attr'])
+            && isset($config['embed_html_attr']['allowfullscreen'])
+            && $config['embed_html_attr']['allowfullscreen']
+        ) {
+            $config['embed_html_attr'] = array_merge(
+                $config['embed_html_attr'],
+                ['webkitallowfullscreen' => true, 'mozallowfullscreen' => true]
+            );
+        }
+
+        $mock->expects($this->once())
+            ->method('createDOMNode')
+            ->with(
+                $this->isInstanceOf('\DOMDocument'),
+                $this->equalTo('iframe'),
+                $this->equalTo($config['embed_html_attr'])
+            );
+
+        $relection = new \ReflectionClass(self::CLASS_NAME);
+        $constructor = $relection->getConstructor();
+        $constructor->invoke($mock, $config);
+    }
+
     /**
      * @dataProvider dpProcessHtml
      */
     public function testProcessHtml($config, $container, $before, $expectedAfter)
     {
-        $mock = $this->getMockBuilder('\\Grav\\Plugin\\VideoEmbed\\ServiceAbstract')
+        $mock = $this->getMockBuilder(self::CLASS_NAME)
             ->setMethods(['getEmbedNodes', 'getRegExpression'])
             ->setConstructorArgs([ $config ])
             ->getMockForAbstractClass();
@@ -29,6 +68,43 @@ class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedAfter, $result);
     }
 
+    /**
+     * @dataProvider dpPrepareStandardEmbed
+     */
+    public function testPrepareStandardEmbed($embedOptions, $expectedSrc, $embedUrl, $urlQuery, array $ignore = [])
+    {
+        $mock = $this->getMockBuilder(self::CLASS_NAME)
+            ->setConstructorArgs([['embed_options' => $embedOptions]])
+            ->enableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $method = new \ReflectionMethod(self::CLASS_NAME, 'prepareStandardEmbed');
+        $method->setAccessible(true);
+
+        $this->assertEquals(
+            $expectedSrc,
+            $method->invoke($mock, $embedUrl, $urlQuery, $ignore, $expectedSrc)
+                ->getAttribute('src')
+        );
+    }
+
+    public function dpConstruct()
+    {
+        return [
+            [[]],
+            [[
+                'embed_html_attr' => [
+                    'allowfullscreen' => false
+                ]
+            ]],
+            [[
+                'embed_html_attr' => [
+                    'allowfullscreen' => true
+                ]
+            ]]
+        ];
+    }
+
     public function dpProcessHtml()
     {
         $data = [];
@@ -47,5 +123,24 @@ class ServiceAbstractTest extends \PHPUnit_Framework_TestCase
         }
 
         return $data;
+    }
+
+    public function dpPrepareStandardEmbed()
+    {
+        return [
+            [
+                ['descr' => 'desc'],
+                '/embed_url1?descr=desc&name=embed1',
+                '/embed_url1',
+                '?name=embed1'
+            ],
+            [
+                ['descr' => 'test', 'ignoringAttr' => 'wtf'],
+                '/embed_url2?descr=test',
+                '/embed_url2',
+                '?&',
+                ['ignoringAttr']
+            ]
+        ];
     }
 }

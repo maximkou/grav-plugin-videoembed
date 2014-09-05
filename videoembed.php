@@ -23,6 +23,7 @@ class VideoEmbedPlugin extends Plugin
 
     /**
      * @return array
+     * @codeCoverageIgnore
      */
     public static function getSubscribedEvents()
     {
@@ -59,6 +60,7 @@ class VideoEmbedPlugin extends Plugin
      * Add styles for video responsiveness
      * @see onPageInitialized
      * @return void
+     * @codeCoverageIgnore
      */
     public function onTwigSiteVariables()
     {
@@ -135,6 +137,7 @@ class VideoEmbedPlugin extends Plugin
      * @param  array $array1
      * @param  mixed $array2
      * @return array
+     * @codeCoverageIgnore
      */
     protected function mergeOptions(array $array1, $array2 = null)
     {
@@ -154,6 +157,7 @@ class VideoEmbedPlugin extends Plugin
 
     /**
      * @return \Grav\Common\Data\Data
+     * @codeCoverageIgnore
      */
     protected function getConfig()
     {
@@ -164,7 +168,7 @@ class VideoEmbedPlugin extends Plugin
     }
 
     /**
-     * Init config anf merge this with user params
+     * Init config and merge this with user params
      * @param array $userConfig
      * @return \Grav\Common\Data\Data
      * @throws \ErrorException

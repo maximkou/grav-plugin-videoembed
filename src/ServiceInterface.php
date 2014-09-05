@@ -6,6 +6,7 @@ namespace Grav\Plugin\VideoEmbed;
  * @package Grav\Plugin\VideoEmbed
  * @author Maxim Hodyrev <maximkou@gmail.com>
  * @license MIT
+ * @codeCoverageIgnore
  */
 interface ServiceInterface
 {
