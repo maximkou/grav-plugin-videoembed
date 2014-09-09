@@ -1,61 +1,214 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Embed Video plugin for Grav CMS</title>
-    <meta name="description" content="Plugin for Grav CMS, that convert links to videos in video sharing services to embed videos.">
-    <meta name="keywords" content="grav plugin, grav, grav cms, grav youtube, grav vimeo, grav vine, grav coub, embed video grav">
-    <meta charset="utf-8">
 
-    <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet" type="text/css">
-    <link href="css/style.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-    <header>
-        <h1>Embed Video plugin for Grav CMS</h1>
-        <h2>simply paste link to video ...</h2>
-    </header>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Grav-plugin-videoembed : Embed video plugin for Grav CMS">
 
-    <section class="main">
-        <section class="content">
-            <h1>About</h1>
-            <p>
-                VideoEmbed - plugin for <a href="http://getgrav.org">Grav CMS</a>, that convert links to popular video sharing services into embed video elements. Plugin supports responsiveness video size(16:9) and more video sharing services:
-                <ol>
-                    <li>Youtube</li>
-                    <li>Vimeo</li>
-                    <li>Coub.com</li>
-                    <li>Vine.co</li>
-                    <li>.. you can propose more services <a href="https://github.com/maximkou/grav-plugin-videoembed/issues/7">here</a></li>
-                </ol>
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-                Licensed under MIT license.
-            </p>
+    <title>Grav-plugin-videoembed</title>
+  </head>
 
-            <h1>How to install and use it?</h1>
-            <p>
-                Read more about installation and configuring plugin on <a href="https://github.com/maximkou/grav-plugin-videoembed">Github project page</a>.
-            </p>
+  <body>
 
-            <h1>Example</h1>
-            <section class="compare">
-                <div>
-                    <h3>Original page source:</h3>
-                    <h3>Result page:</h3>
-                </div>
-                <div>
-                    <pre>
-                        <code>Home<br>------------<br>## See this youtube video!<br><br>https://www.youtube.com/watch?v=rZudJiJcw3s<br></code>
-                    </pre>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/maximkou/grav-plugin-videoembed">View on GitHub</a>
 
-                    <pre><img src="img/example.png"/></pre>
-                </div>
+          <h1 id="project_title">Grav-plugin-videoembed</h1>
+          <h2 id="project_tagline">Embed video plugin for Grav CMS</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/maximkou/grav-plugin-videoembed/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/maximkou/grav-plugin-videoembed/tarball/master">Download this project as a tar.gz file</a>
             </section>
+        </header>
+    </div>
 
-        </section>
-    </section>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a name="embed-video-plugin-for-grav-cms" class="anchor" href="#embed-video-plugin-for-grav-cms"><span class="octicon octicon-link"></span></a>Embed Video plugin for <a href="http://getgrav.org">Grav CMS</a>
+</h2>
 
-    <footer>
-        Maintained by <a href="https://github.com/maximkou">Maxim Hodyrev (maximkou)</a>, 2014
-    </footer>
-</body>
+<p><a href="https://travis-ci.org/maximkou/grav-plugin-videoembed"><img src="https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v1.0" alt="Build Status"></a>
+<a href="https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/?branch=master"><img src="https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/badges/quality-score.png?b=master" alt="Scrutinizer Code Quality"></a>
+<a href="https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/?branch=master"><img src="https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/badges/coverage.png?b=master" alt="Code Coverage"></a>
+<a href="https://insight.sensiolabs.com/projects/127bf39f-d49a-4c9b-965d-2eb97e384fe4"><img src="https://insight.sensiolabs.com/projects/127bf39f-d49a-4c9b-965d-2eb97e384fe4/mini.png" alt="SensioLabsInsight"></a></p>
+
+<p>This plugin convert links to videos from popular sharing services to embed format. Supported services:</p>
+
+<ul>
+<li>Youtube</li>
+<li>Vimeo</li>
+<li>Coub.com</li>
+<li>Vine.co</li>
+<li>... you can propose more services <a href="https://github.com/maximkou/grav-plugin-videoembed/issues">here</a>
+</li>
+</ul><h2>
+<a name="working-example" class="anchor" href="#working-example"><span class="octicon octicon-link"></span></a>Working example</h2>
+
+<p>This <code>.md</code> page source:</p>
+
+<pre><code>Home
+------------
+## See this youtube video!
+
+https://www.youtube.com/watch?v=rZudJiJcw3s
+
+</code></pre>
+
+<p>Will be converted to:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;h1&gt;</span>Home<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;h2&gt;</span>See this youtube video!<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;div&gt;</span>
+    <span class="nt">&lt;iframe</span> <span class="na">src=</span><span class="s">"//youtube.com/embed/rZudJiJcw3s"</span><span class="nt">&gt;&lt;/iframe&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>There are two ways to install plugin:</p>
+
+<ol>
+<li><p>Download the zip version of this repository and unzip it under <code>/your/site/grav/user/plugins</code>. Then, rename the folder to <code>videoembed</code>. 
+You should now have all the plugin files under <code>/your/site/grav/user/plugins/videoembed</code></p></li>
+<li><p>Simply add plugin dependency into <code>.dependencies</code> file, e.g:</p></li>
+</ol><pre><code>git:
+    videoembed:
+        url: https://github.com/maximkou/grav-plugin-videoembed.git
+        path: user/plugins/videoembed
+        branch: master
+</code></pre>
+
+<p>And then run <code>php bin/grav install</code></p>
+
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>All configuration rules located in <code>videoembed.yaml</code></p>
+
+<h3>
+<a name="default-config" class="anchor" href="#default-config"><span class="octicon octicon-link"></span></a>Default config</h3>
+
+<pre><code>enabled: true
+
+# responsive video size
+responsive: false
+
+# embed element container, if this section empty - not use container
+container:
+    element: div
+    # container element html attributes
+    html_attr:
+        class: video-container
+
+# supported services configs
+services:
+    youtube:
+        # you can disable support 
+        enabled: true
+        # embed element html attributes, for youtube element is iframe
+        embed_html_attr:
+            frameborder: 0
+            width      : 560
+            height     : 315
+        # options, which you will add for videos
+        embed_options:
+            autoplay   : 1
+            autohide   : 1
+            fs         : 1
+            rel        : 0
+            hd         : 1
+            vq         : hd1080
+            wmode      : opaque
+            enablejsapi: 1
+     vimeo:
+        # some config
+     ....
+
+</code></pre>
+
+<h3>
+<a name="customizing-single-videopage-videos-parameters" class="anchor" href="#customizing-single-videopage-videos-parameters"><span class="octicon octicon-link"></span></a>Customizing single video/page videos parameters</h3>
+
+<p>If you need set custom plugin parameters for single page, set plugin parameters in page header in section <code>videoembed</code>, e.g:</p>
+
+<pre><code>---
+# ... more headers
+videoembed:
+    services:
+        youtube:
+            embed_options:
+                fs: 2
+---
+</code></pre>
+
+<p>You can override default <code>embed_options</code> for each video, for do this simply add params to end of video url. Your params will be applied on default embed options.</p>
+
+<p>Example (using default options), link </p>
+
+<pre><code>http://youtu.be/AsdjHDHksdf?autoplay=0&amp;wmode=transparent
+</code></pre>
+
+<p>will be converted to something like this:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"video-container"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;iframe</span> <span class="na">src=</span><span class="s">"//youtube.com/embed/AsdjHDHksdf?autoplay=0&amp;rel=0&amp;hd=1&amp;vq=hd1080&amp;wmode=transparent"</span><span class="nt">&gt;&lt;/iframe&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+
+<h3>
+<a name="responsive-video-size" class="anchor" href="#responsive-video-size"><span class="octicon octicon-link"></span></a>Responsive video size</h3>
+
+<p>If you want to have responsive video size, set <code>responsive</code> option to <code>true</code>.
+This option add responsiveness support(in 16:9 ratio) by using <a href="http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php">this method for iframes</a>.
+If this option enabled, plugin add <code>plugin-videoembed-container-fluid</code> class for container.</p>
+
+<p><strong>Attention:</strong> this option requires defined <code>container.element</code> option. If option is not defined - you got plugin error. Disable responsiveness, if you want not use video wrapper.</p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2014 Maxim Hodyrev</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Grav-plugin-videoembed maintained by <a href="https://github.com/maximkou">maximkou</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
 </html>
