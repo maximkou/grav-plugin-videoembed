@@ -35,27 +35,48 @@ class Vine extends ServiceAbstract
      */
     public function getEmbedNodes(array $matches)
     {
-        $allowedTypes = ['simple', 'postcard'];
-        $type = $matches[7];
-        if (empty($type)) {
+        $nodes = [];
+        $nodes[] = $iFrame = $this->prepareStandardEmbed(
+            'https://vine.co/v/'.$matches[5].'/embed/'.$this->getEmbedType($matches),
+            !empty($matches[8]) ? $matches[8] : null,
+            ['type']
+        );
+        $nodes[] = $script = $iFrame->ownerDocument->createElement('script');
+
+        $this->batchSetAttributes(
+            [$script, 'setAttribute'],
+            [
+                'async' => true,
+                'src' => '//platform.vine.co/static/scripts/embed.js',
+                'charset' => 'utf-8'
+            ]
+        );
+
+        return $nodes;
+    }
+
+    /**
+     * Get video embed type
+     * @param array $matches
+     * @return string
+     */
+    protected function getEmbedType(array $matches)
+    {
+        $allowedTypes = [
+            'simple',
+            'postcard'
+        ];
+
+        if (empty($matches[7])) {
             $type = $this->config->get('embed_options.type');
+        } else {
+            $type = $matches[7];
         }
 
         if (!in_array($type, $allowedTypes)) {
             $type = $allowedTypes[0];
         }
 
-        $nodes = [];
-        $nodes[] = $iFrame = $this->prepareStandardEmbed(
-            'https://vine.co/v/'.$matches[5].'/embed/'.$type,
-            !empty($matches[8]) ? $matches[8] : null,
-            ['type']
-        );
-        $nodes[] = $script = $iFrame->ownerDocument->createElement('script');
-        $script->setAttribute('async', true);
-        $script->setAttribute('src', '//platform.vine.co/static/scripts/embed.js');
-        $script->setAttribute('charset', 'utf-8');
-
-        return $nodes;
+        return $type;
     }
 }
