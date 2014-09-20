@@ -10,11 +10,9 @@ class Service implements ServiceInterface
 {
 
     /**
-     * Process html
-     * @param string $html
-     * @return string
+     * {@inheritDoc}
      */
-    public function processHtml($html)
+    public function processHtml($html, \DOMNode $container = null, &$replacedCount = null)
     {
         // TODO: Implement processHtml() method.
     }

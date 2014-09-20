@@ -45,12 +45,9 @@ abstract class ServiceAbstract implements ServiceInterface
     }
 
     /**
-     * Process html
-     * @param string $html
-     * @param \DOMNode $container
-     * @return string
+     * {@inheritDoc}
      */
-    public function processHtml($html, \DOMNode $container = null)
+    public function processHtml($html, \DOMNode $container = null, &$replacedCount = null)
     {
         $urlRegExpr = $this->getRegExpression();
         $linkRegexp = "/<a href=\"$urlRegExpr\">$urlRegExpr<\/a>/i";
@@ -82,7 +79,7 @@ abstract class ServiceAbstract implements ServiceInterface
             }
 
             return $document->saveHTML($container);
-        }, $html);
+        }, $html, -1, $replacedCount);
     }
 
     /**

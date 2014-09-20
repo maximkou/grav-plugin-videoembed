@@ -28,32 +28,9 @@ class VideoEmbedPlugin extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'onPageInitialized' => ['onPageInitialized', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
             'onPageProcessed' => ['onPageProcessed', 0],
         ];
-    }
-
-    /**
-     * If in page headers defined responsive option
-     * or global config require responsiveness
-     * enable adding responsive css
-     * @return void
-     */
-    public function onPageInitialized()
-    {
-        /** @var \Grav\Common\Page\Page $page */
-        $page = $this->grav['page'];
-
-        $headerResponsive = $page->value('header.videoembed.responsive', null);
-        $defaultsResponsive = $this->config->get('plugins.videoembed.responsive');
-        if (
-            ($page && $headerResponsive) ||
-            ($headerResponsive === null && $defaultsResponsive)
-        ) {
-            $this->enable([
-                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
-            ]);
-        }
     }
 
     /**
@@ -64,7 +41,17 @@ class VideoEmbedPlugin extends Plugin
      */
     public function onTwigSiteVariables()
     {
-        $this->grav['assets']->add('plugin://videoembed/css/videombed-responsive.css');
+        /** @var \Grav\Common\Page\Page $page */
+        $page = $this->grav['page'];
+
+        $assets = [];
+        if (!empty($page->header()->videoembed['assets'])) {
+            $assets = (array)$page->header()->videoembed['assets'];
+        }
+
+        foreach ($assets as $asset) {
+            $this->grav['assets']->add($asset);
+        }
     }
 
     /**
@@ -80,15 +67,45 @@ class VideoEmbedPlugin extends Plugin
         /** @var \Grav\Common\Page\Page $page */
         $page = $event->offsetGet('page');
         $headers = $page->header();
-        $this->initConfig(isset($headers->videoembed) ? $headers->videoembed : []);
+
+        $localConfig = [];
+        if (isset($headers->videoembed)) {
+            $localConfig = $headers->videoembed;
+        }
+        $this->initConfig($localConfig);
 
         $content = $page->content();
         $services = $this->getEnabledServicesSettings();
 
         $container = $this->getEmbedContainer();
+        $assets = [];
+        $totalReplaced = 0;
         foreach ($services as $serviceName => $serviceConfig) {
             $service = $this->getServiceByName($serviceName, $serviceConfig);
-            $content = $service->processHtml($content, $container);
+            $content = $service->processHtml($content, $container, $replacedCount);
+
+            $totalReplaced += $replacedCount;
+            if ($replacedCount > 0) {
+                $assets = array_merge(
+                    $assets,
+                    $this->getConfig()->get("services.$serviceName.assets")
+                );
+            }
+        }
+
+        if ($totalReplaced > 0 && $this->getConfig()->get('responsive', false)) {
+            $assets[] = 'plugin://videoembed/css/videombed-responsive.css';
+        }
+
+        if (!empty($assets)) {
+            $header = [];
+            if (isset($headers->videoembed)) {
+                $header = $headers->videoembed;
+            }
+            $page->header()->videoembed = array_merge(
+                $header,
+                ['assets' => $assets]
+            );
         }
 
         $isProcessMarkdown = $page->shouldProcess('markdown');

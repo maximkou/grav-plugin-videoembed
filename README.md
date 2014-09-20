@@ -11,7 +11,8 @@ This plugin convert links to videos from popular sharing services to embed forma
 * Vimeo
 * Coub.com
 * Vine.co
-* ... you can propose more services [here](https://github.com/maximkou/grav-plugin-videoembed/issues)
+* Custom/self-hosted videos support using VideoJS - http://www.videojs.com
+* ... you can propose more services [here](https://github.com/maximkou/grav-plugin-videoembed/issues/7)
 
 ## Working example
 
@@ -37,7 +38,7 @@ Will be converted to:
 ## Installation
 There are two ways to install plugin:
 
-1. Download the zip version of this repository and unzip it under `/your/site/grav/user/plugins`. Then, rename the folder to `videoembed`. 
+1. (Recomended) Download the zip version of this repository and unzip it under `/your/site/grav/user/plugins`. Then, rename the folder to `videoembed`. 
 You should now have all the plugin files under `/your/site/grav/user/plugins/videoembed`
 
 2. Simply add plugin dependency into `.dependencies` file, e.g:
@@ -54,32 +55,55 @@ And then run `php bin/grav install`
 
 All configuration rules located in `videoembed.yaml`
 
-### Default config
+### Plugin settings
+#### Disable/enable plugin
 
+You can disable/enable plugin by changing `enabled` option, example:
 ```
-enabled: true
+enabled: true # enabled: false for disable
+```
 
-# responsive video size
+#### Responsiveness
+Plugin support `responsive` video size in 16:9 ratio. This option disabled by default.
+Used [this method for iframes](http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php).
+```
 responsive: false
+```
 
-# embed element container, if this section empty - not use container
+#### Wrapping embed element
+By default, plugin wrap embed element into `div.video-container`, you can change this behaviour by changing `container` option.
+```
 container:
-    element: div
-    # container element html attributes
+    element: div # wrapper html element name
+    # wrapper element html attributes, like ID, class
     html_attr:
         class: video-container
+```
+If you have not use wrapper, remove or comment this directive.
+**Attention:** Responsiveness option works only with defined container. If `responsive` option enabled and `container` is not defined - you got error.
 
-# supported services configs
+### Supported services settings
+All services configuration located in `services` section of `videoembed.yaml`.
+
+**Available options:**
+
+* *enabled*: disable/enable some service support
+* *assets*: add `js`, `css` assets into page, if created embed video, using this service
+* *embed_html_attr*: html attributes for embed element(iframe/video), e.g. `width: 0` will create `<iframe width="0">...</iframe>`
+* *embed_options*: video options, e.g. autoplay (not available for `videoJS` service)
+* *data_setup (only for VideoJS)*: video options, see more [here](https://github.com/videojs/video.js/blob/stable/docs/guides/options.md)
+
+**Default services configuration:**
+
+```
 services:
     youtube:
-        # you can disable support 
         enabled: true
-        # embed element html attributes, for youtube element is iframe
         embed_html_attr:
-            frameborder: 0
-            width      : 560
-            height     : 315
-        # options, which you will add for videos
+            frameborder     : 0
+            width           : 560
+            height          : 315
+            allowfullscreen : true
         embed_options:
             autoplay   : 1
             autohide   : 1
@@ -89,13 +113,62 @@ services:
             vq         : hd1080
             wmode      : opaque
             enablejsapi: 1
-     vimeo:
-        # some config
-     ....
-
+    vimeo:
+        enabled: true
+        embed_html_attr:
+            frameborder     : 0
+            width           : 560
+            height          : 315
+            allowfullscreen : true
+        embed_options:
+            autoplay   : 0
+            loop       : 0
+            color      : ffffff
+            byline     : 1
+            portrait   : 1
+            title      : 1
+    coub:
+        enabled: true
+        embed_html_attr:
+            frameborder     : 0
+            width           : 560
+            height          : 315
+            allowfullscreen : true
+        embed_options:
+            muted         : 'false'
+            autostart     : 'false'
+            originalSize  : 'false'
+            hideTopBar    : 'true'
+            startWithHD   : 'true'
+    vine:
+        enabled : true
+        assets  : ["//platform.vine.co/static/scripts/embed.js"]
+        embed_html_attr:
+            class           : 'vine-embed'
+            frameborder     : 0
+            width           : 560
+            height          : 315
+        embed_options:
+            audio : 1
+            type  : 'simple'
+    videoJS:
+        enabled : true
+        assets  : ["http://vjs.zencdn.net/4.8/video.js", "http://vjs.zencdn.net/4.8/video-js.css"]
+        embed_html_attr:
+            class           : 'video-js vjs-default-skin'
+            frameborder     : 0
+            width           : 560
+            height          : 315
+        data_setup:
+            controls        : true
+            autoplay        : false
+            preload         : 'auto'
+            poster          : null
+            loop            : false
 ```
 
-### Customizing single video/page videos parameters
+
+## Customizing single video/page videos parameters
 If you need set custom plugin parameters for single page, set plugin parameters in page header in section `videoembed`, e.g:
 
 ```
@@ -122,13 +195,6 @@ will be converted to something like this:
 	<iframe src="//youtube.com/embed/AsdjHDHksdf?autoplay=0&rel=0&hd=1&vq=hd1080&wmode=transparent"></iframe>
 </div>
 ```
-
-### Responsive video size
-If you want to have responsive video size, set `responsive` option to `true`.
-This option add responsiveness support(in 16:9 ratio) by using [this method for iframes](http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php).
-If this option enabled, plugin add `plugin-videoembed-container-fluid` class for container.
-
-**Attention:** this option requires defined `container.element` option. If option is not defined - you got plugin error. Disable responsiveness, if you want not use video wrapper.
 
 ## License
 The MIT License (MIT)

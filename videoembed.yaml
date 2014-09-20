@@ -51,12 +51,27 @@ services:
             hideTopBar    : 'true'
             startWithHD   : 'true'
     vine:
-        enabled: true
+        enabled : true
+        assets  : ["//platform.vine.co/static/scripts/embed.js"]
         embed_html_attr:
-            class:          : 'vine-embed'
+            class           : 'vine-embed'
             frameborder     : 0
             width           : 560
             height          : 315
         embed_options:
             audio : 1
             type  : 'simple'
+    videoJS:
+        enabled : true
+        assets  : ["http://vjs.zencdn.net/4.8/video.js", "http://vjs.zencdn.net/4.8/video-js.css"]
+        embed_html_attr:
+            class           : 'video-js vjs-default-skin'
+            frameborder     : 0
+            width           : 560
+            height          : 315
+        data_setup:
+            controls        : true
+            autoplay        : false
+            preload         : 'auto'
+            poster          : null
+            loop            : false

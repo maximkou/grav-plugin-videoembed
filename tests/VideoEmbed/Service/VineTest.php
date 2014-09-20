@@ -31,9 +31,7 @@ class VineTest extends AbstractServiceTest
             $this->createMatchesArray($vId, $urlQuery)
         );
 
-        $this->assertEquals($node, $nodes[0]);
-        $this->assertEquals($nodes[1]->nodeName, 'script');
-        $this->assertTrue($nodes[1]->hasAttribute('src'));
+        $this->assertEquals($node, $nodes);
     }
 
     /**

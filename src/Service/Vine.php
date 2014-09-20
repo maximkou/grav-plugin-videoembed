@@ -35,24 +35,11 @@ class Vine extends ServiceAbstract
      */
     public function getEmbedNodes(array $matches)
     {
-        $nodes = [];
-        $nodes[] = $iFrame = $this->prepareStandardEmbed(
+        return $this->prepareStandardEmbed(
             'https://vine.co/v/'.$matches[5].'/embed/'.$this->getEmbedType($matches),
             !empty($matches[8]) ? $matches[8] : null,
             ['type']
         );
-        $nodes[] = $script = $iFrame->ownerDocument->createElement('script');
-
-        $this->batchSetAttributes(
-            [$script, 'setAttribute'],
-            [
-                'async' => true,
-                'src' => '//platform.vine.co/static/scripts/embed.js',
-                'charset' => 'utf-8'
-            ]
-        );
-
-        return $nodes;
     }
 
     /**

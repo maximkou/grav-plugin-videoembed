@@ -13,9 +13,11 @@ interface ServiceInterface
     /**
      * Process html
      * @param string $html
+     * @param \DOMNode $container
+     * @param int $replacedCount
      * @return string
      */
-    public function processHtml($html);
+    public function processHtml($html, \DOMNode $container = null, &$replacedCount = null);
 
     /**
      * Get regular expression, which take service url
