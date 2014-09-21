@@ -39,7 +39,9 @@
 <li>Vimeo</li>
 <li>Coub.com</li>
 <li>Vine.co</li>
-<li>... you can propose more services <a href="https://github.com/maximkou/grav-plugin-videoembed/issues">here</a>
+<li>Custom videos support using VideoJS - <a href="http://www.videojs.com">http://www.videojs.com</a>
+</li>
+<li>... you can propose more services <a href="https://github.com/maximkou/grav-plugin-videoembed/issues/7">here</a>
 </li>
 </ul><h2>
 <a name="working-example" class="anchor" href="#working-example"><span class="octicon octicon-link"></span></a>Working example</h2>
@@ -69,7 +71,7 @@ https://www.youtube.com/watch?v=rZudJiJcw3s
 <p>There are two ways to install plugin:</p>
 
 <ol>
-<li><p>Download the zip version of this repository and unzip it under <code>/your/site/grav/user/plugins</code>. Then, rename the folder to <code>videoembed</code>. 
+<li><p>(Recomended) Download the zip version of this repository and unzip it under <code>/your/site/grav/user/plugins</code>. Then, rename the folder to <code>videoembed</code>. 
 You should now have all the plugin files under <code>/your/site/grav/user/plugins/videoembed</code></p></li>
 <li><p>Simply add plugin dependency into <code>.dependencies</code> file, e.g:</p></li>
 </ol><pre><code>git:
@@ -87,48 +89,67 @@ You should now have all the plugin files under <code>/your/site/grav/user/plugin
 <p>All configuration rules located in <code>videoembed.yaml</code></p>
 
 <h3>
-<a name="default-config" class="anchor" href="#default-config"><span class="octicon octicon-link"></span></a>Default config</h3>
+<a name="plugin-settings" class="anchor" href="#plugin-settings"><span class="octicon octicon-link"></span></a>Plugin settings</h3>
 
-<pre><code>enabled: true
+<h4>
+<a name="disableenable-plugin" class="anchor" href="#disableenable-plugin"><span class="octicon octicon-link"></span></a>Disable/enable plugin</h4>
 
-# responsive video size
-responsive: false
+<p>You can disable/enable plugin by changing <code>enabled</code> option, example:</p>
 
-# embed element container, if this section empty - not use container
-container:
-    element: div
-    # container element html attributes
-    html_attr:
-        class: video-container
-
-# supported services configs
-services:
-    youtube:
-        # you can disable support 
-        enabled: true
-        # embed element html attributes, for youtube element is iframe
-        embed_html_attr:
-            frameborder: 0
-            width      : 560
-            height     : 315
-        # options, which you will add for videos
-        embed_options:
-            autoplay   : 1
-            autohide   : 1
-            fs         : 1
-            rel        : 0
-            hd         : 1
-            vq         : hd1080
-            wmode      : opaque
-            enablejsapi: 1
-     vimeo:
-        # some config
-     ....
-
+<pre><code>enabled: true # enabled: false for disable
 </code></pre>
 
+<h4>
+<a name="responsiveness" class="anchor" href="#responsiveness"><span class="octicon octicon-link"></span></a>Responsiveness</h4>
+
+<p>Plugin support <code>responsive</code> video size in 16:9 ratio. This option disabled by default.
+Used <a href="http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php">this method for iframes</a>.</p>
+
+<pre><code>responsive: false
+</code></pre>
+
+<h4>
+<a name="wrapping-embed-element" class="anchor" href="#wrapping-embed-element"><span class="octicon octicon-link"></span></a>Wrapping embed element</h4>
+
+<p>By default, plugin wrap embed element into <code>div.video-container</code>, you can change this behaviour by changing <code>container</code> option.</p>
+
+<pre><code>container:
+    element: div # wrapper html element name
+    # wrapper element html attributes, like ID, class
+    html_attr:
+        class: video-container
+</code></pre>
+
+<p>If you have not use wrapper, remove or comment this directive.</p>
+
+<p><strong>Attention:</strong> Responsiveness option works only with defined container. If <code>responsive</code> option enabled and <code>container</code> is not defined - you got error.</p>
+
 <h3>
-<a name="customizing-single-videopage-videos-parameters" class="anchor" href="#customizing-single-videopage-videos-parameters"><span class="octicon octicon-link"></span></a>Customizing single video/page videos parameters</h3>
+<a name="supported-services-settings" class="anchor" href="#supported-services-settings"><span class="octicon octicon-link"></span></a>Supported services settings</h3>
+
+<p>All services configuration located in <code>services</code> section of <code>videoembed.yaml</code>.</p>
+
+<p><strong>Available options:</strong></p>
+
+<ul>
+<li>
+<em>enabled</em>: disable/enable some service support.</li>
+<li>
+<em>assets</em>: add service-specific assets(<code>js</code>, <code>css</code>) into page <code>&lt;HEAD&gt;</code> block. Assets will be added, if service support enabled and if least one link to service was replaced.</li>
+<li>
+<em>embed_html_attr</em>: html attributes for embed element(iframe/video), e.g. <code>width: 0</code> will create <code>&lt;iframe width="0"&gt;...&lt;/iframe&gt;</code>
+</li>
+<li>
+<em>embed_options</em>: video options, e.g. autoplay (not available for self-hosted videos(<code>VideoJS</code>))</li>
+<li>
+<em>data_setup (only for <code>VideoJS</code>)</em>: video options, see more <a href="https://github.com/videojs/video.js/blob/stable/docs/guides/options.md">here</a>
+</li>
+</ul><p><strong>Default services configuration:</strong></p>
+
+<p>You can see default services configuration in <a href="https://github.com/maximkou/grav-plugin-videoembed/blob/development/videoembed.yaml#L9">videoembed.yaml</a> file.</p>
+
+<h2>
+<a name="customizing-single-videopage-videos-parameters" class="anchor" href="#customizing-single-videopage-videos-parameters"><span class="octicon octicon-link"></span></a>Customizing single video/page videos parameters</h2>
 
 <p>If you need set custom plugin parameters for single page, set plugin parameters in page header in section <code>videoembed</code>, e.g:</p>
 
@@ -155,15 +176,6 @@ videoembed:
     <span class="nt">&lt;iframe</span> <span class="na">src=</span><span class="s">"//youtube.com/embed/AsdjHDHksdf?autoplay=0&amp;rel=0&amp;hd=1&amp;vq=hd1080&amp;wmode=transparent"</span><span class="nt">&gt;&lt;/iframe&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
-
-<h3>
-<a name="responsive-video-size" class="anchor" href="#responsive-video-size"><span class="octicon octicon-link"></span></a>Responsive video size</h3>
-
-<p>If you want to have responsive video size, set <code>responsive</code> option to <code>true</code>.
-This option add responsiveness support(in 16:9 ratio) by using <a href="http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php">this method for iframes</a>.
-If this option enabled, plugin add <code>plugin-videoembed-container-fluid</code> class for container.</p>
-
-<p><strong>Attention:</strong> this option requires defined <code>container.element</code> option. If option is not defined - you got plugin error. Disable responsiveness, if you want not use video wrapper.</p>
 
 <h2>
 <a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
