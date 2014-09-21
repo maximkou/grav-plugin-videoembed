@@ -87,11 +87,16 @@ EOT;
             json_encode($dataSetup)
         );
 
-        $source = $this->embed->ownerDocument->createElement('source');
-        $source->setAttribute('src', $matches[1]);
-        $source->setAttribute('type', $this->getSupportedExt()[$matches[7]]);
+        $doc = $this->embed->ownerDocument;
 
-        $isNotSupportedMsg = $this->embed->ownerDocument->createDocumentFragment();
+        $source = $doc->createElement('source');
+        $source->setAttribute('src', $matches[1]);
+        $source->setAttribute(
+            'type',
+            $this->getSupportedExt()[$matches[7]]
+        );
+
+        $isNotSupportedMsg = $doc->createDocumentFragment();
         $isNotSupportedMsg->appendXML($this->notSupportedMessage);
 
         $this->embed->appendChild($source);

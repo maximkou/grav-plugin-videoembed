@@ -11,7 +11,7 @@ This plugin convert links to videos from popular sharing services to embed forma
 * Vimeo
 * Coub.com
 * Vine.co
-* Custom/self-hosted videos support using VideoJS - http://www.videojs.com
+* Custom videos support using VideoJS - http://www.videojs.com
 * ... you can propose more services [here](https://github.com/maximkou/grav-plugin-videoembed/issues/7)
 
 ## Working example
@@ -80,6 +80,7 @@ container:
         class: video-container
 ```
 If you have not use wrapper, remove or comment this directive.
+
 **Attention:** Responsiveness option works only with defined container. If `responsive` option enabled and `container` is not defined - you got error.
 
 ### Supported services settings
@@ -87,85 +88,15 @@ All services configuration located in `services` section of `videoembed.yaml`.
 
 **Available options:**
 
-* *enabled*: disable/enable some service support
-* *assets*: add `js`, `css` assets into page, if created embed video, using this service
+* *enabled*: disable/enable some service support.
+* *assets*: add service-specific assets(`js`, `css`) into page `<HEAD>` block. Assets will be added, if service support enabled and if least one link to service was replaced.
 * *embed_html_attr*: html attributes for embed element(iframe/video), e.g. `width: 0` will create `<iframe width="0">...</iframe>`
-* *embed_options*: video options, e.g. autoplay (not available for `videoJS` service)
-* *data_setup (only for VideoJS)*: video options, see more [here](https://github.com/videojs/video.js/blob/stable/docs/guides/options.md)
+* *embed_options*: video options, e.g. autoplay (not available for self-hosted videos(`VideoJS`))
+* *data_setup (only for `VideoJS`)*: video options, see more [here](https://github.com/videojs/video.js/blob/stable/docs/guides/options.md)
 
 **Default services configuration:**
 
-```
-services:
-    youtube:
-        enabled: true
-        embed_html_attr:
-            frameborder     : 0
-            width           : 560
-            height          : 315
-            allowfullscreen : true
-        embed_options:
-            autoplay   : 1
-            autohide   : 1
-            fs         : 1
-            rel        : 0
-            hd         : 1
-            vq         : hd1080
-            wmode      : opaque
-            enablejsapi: 1
-    vimeo:
-        enabled: true
-        embed_html_attr:
-            frameborder     : 0
-            width           : 560
-            height          : 315
-            allowfullscreen : true
-        embed_options:
-            autoplay   : 0
-            loop       : 0
-            color      : ffffff
-            byline     : 1
-            portrait   : 1
-            title      : 1
-    coub:
-        enabled: true
-        embed_html_attr:
-            frameborder     : 0
-            width           : 560
-            height          : 315
-            allowfullscreen : true
-        embed_options:
-            muted         : 'false'
-            autostart     : 'false'
-            originalSize  : 'false'
-            hideTopBar    : 'true'
-            startWithHD   : 'true'
-    vine:
-        enabled : true
-        assets  : ["//platform.vine.co/static/scripts/embed.js"]
-        embed_html_attr:
-            class           : 'vine-embed'
-            frameborder     : 0
-            width           : 560
-            height          : 315
-        embed_options:
-            audio : 1
-            type  : 'simple'
-    videoJS:
-        enabled : true
-        assets  : ["http://vjs.zencdn.net/4.8/video.js", "http://vjs.zencdn.net/4.8/video-js.css"]
-        embed_html_attr:
-            class           : 'video-js vjs-default-skin'
-            frameborder     : 0
-            width           : 560
-            height          : 315
-        data_setup:
-            controls        : true
-            autoplay        : false
-            preload         : 'auto'
-            poster          : null
-            loop            : false
-```
+You can see default services configuration in [videoembed.yaml](https://github.com/maximkou/grav-plugin-videoembed/blob/development/videoembed.yaml#L9) file.
 
 
 ## Customizing single video/page videos parameters
