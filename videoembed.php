@@ -1,8 +1,10 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
 use Grav\Component\EventDispatcher\Event;
+use \Grav\Common\Data\Data;
 
 /**
  * Class VideoEmbedPlugin
@@ -28,32 +30,9 @@ class VideoEmbedPlugin extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'onPageInitialized' => ['onPageInitialized', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
             'onPageProcessed' => ['onPageProcessed', 0],
         ];
-    }
-
-    /**
-     * If in page headers defined responsive option
-     * or global config require responsiveness
-     * enable adding responsive css
-     * @return void
-     */
-    public function onPageInitialized()
-    {
-        /** @var \Grav\Common\Page\Page $page */
-        $page = $this->grav['page'];
-
-        $headerResponsive = $page->value('header.videoembed.responsive', null);
-        $defaultsResponsive = $this->config->get('plugins.videoembed.responsive');
-        if (
-            ($page && $headerResponsive) ||
-            ($headerResponsive === null && $defaultsResponsive)
-        ) {
-            $this->enable([
-                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
-            ]);
-        }
     }
 
     /**
@@ -64,7 +43,17 @@ class VideoEmbedPlugin extends Plugin
      */
     public function onTwigSiteVariables()
     {
-        $this->grav['assets']->add('plugin://videoembed/css/videombed-responsive.css');
+        /** @var \Grav\Common\Page\Page $page */
+        $page = $this->grav['page'];
+
+        $assets = [];
+        if (!empty($page->header()->videoembed['assets'])) {
+            $assets = (array)$page->header()->videoembed['assets'];
+        }
+
+        foreach ($assets as $asset) {
+            $this->grav['assets']->add($asset);
+        }
     }
 
     /**
@@ -79,16 +68,23 @@ class VideoEmbedPlugin extends Plugin
 
         /** @var \Grav\Common\Page\Page $page */
         $page = $event->offsetGet('page');
-        $headers = $page->header();
-        $this->initConfig(isset($headers->videoembed) ? $headers->videoembed : []);
 
         $content = $page->content();
         $services = $this->getEnabledServicesSettings();
-
         $container = $this->getEmbedContainer();
+
+        $usedServices = [];
         foreach ($services as $serviceName => $serviceConfig) {
             $service = $this->getServiceByName($serviceName, $serviceConfig);
-            $content = $service->processHtml($content, $container);
+            $content = $service->processHtml($content, $container, $processedCnt);
+
+            if ($processedCnt > 0) {
+                $usedServices[] = $serviceName;
+            }
+        }
+
+        if (!empty($usedServices)) {
+            $this->defineAssets($page, $usedServices);
         }
 
         $isProcessMarkdown = $page->shouldProcess('markdown');
@@ -152,6 +148,7 @@ class VideoEmbedPlugin extends Plugin
                 }
             }
         }
+
         return $array1;
     }
 
@@ -164,6 +161,7 @@ class VideoEmbedPlugin extends Plugin
         if (!$this->cfg) {
             return $this->initConfig();
         }
+
         return $this->cfg;
     }
 
@@ -175,39 +173,98 @@ class VideoEmbedPlugin extends Plugin
      */
     protected function initConfig($userConfig = [])
     {
-        $config = $this->mergeOptions(
-            (array)$this->config->get('plugins.videoembed', []),
-            $userConfig
-        );
+        $config = (array)$this->config->get('plugins.videoembed', []);
 
-        $this->cfg = new \Grav\Common\Data\Data($config);
+        if (isset($this->grav['page'])) {
+            $headers = $this->grav['page']->header();
+
+            if (isset($headers->videoembed)) {
+                $config = $this->mergeOptions($config, (array)$headers->videoembed);
+            }
+        }
+
+        if (!empty($userConfig)) {
+            $config = $this->mergeOptions($config, $userConfig);
+        }
+
+        $this->cfg = new Data($config);
+
+        if ($this->cfg->get('responsive')) {
+            $this->enableResponsiveness();
+        }
+
+        return $this->cfg;
+    }
+
+    /**
+     * @throws \ErrorException
+     */
+    protected function enableResponsiveness()
+    {
+        $config = $this->getConfig();
 
         /**
          * if you enable responsiveness, you need use some container for video
          * @see http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php
          */
-        if (!$this->cfg->get('container.element') && $this->cfg->get('responsive', false)) {
+        if (!$config->get('container.element')) {
             throw new \ErrorException(
                 '"Responsive" option requires using some container for video.
                 Please, set "container.element" option or disable responsiveness.'
             );
         }
 
-        if ($this->cfg->get('responsive', false)) {
-            $containerClasses = explode(' ', $this->cfg->get('container.html_attr.class', ''));
-            $containerClasses = array_map('trim', $containerClasses);
-            $fluidClass = 'plugin-videoembed-container-fluid';
+        $containerClasses = explode(' ', $config->get('container.html_attr.class', ''));
+        $containerClasses = array_map('trim', $containerClasses);
 
-            if (!in_array($fluidClass, $containerClasses)) {
-                $containerClasses[] = $fluidClass;
-                $this->cfg->set(
-                    'container.html_attr.class',
-                    implode(' ', $containerClasses)
-                );
-            }
+        $containerClasses[] = 'plugin-videoembed-container-fluid';
+        $containerClasses = array_unique($containerClasses);
+
+        $config->set(
+            'container.html_attr.class',
+            implode(' ', $containerClasses)
+        );
+
+        $assets = (array)$config->get('assets', []);
+        $assets[] = 'plugin://videoembed/css/videombed-responsive.css';
+
+        $config->set('assets', array_unique($assets));
+    }
+
+    /**
+     * @param Page $page
+     * @param array $services
+     */
+    protected function defineAssets(Page $page, array $services)
+    {
+        if (empty($services)) {
+            return;
         }
 
-        return $this->cfg;
+        $assets = (array)$this->getConfig()->get('assets', []);
+
+        foreach ($services as $name) {
+            $assets = array_merge(
+                $assets,
+                $this->getConfig()->get("services.$name.assets", [])
+            );
+        }
+
+        $assets = array_unique($assets);
+
+        if (!empty($assets)) {
+            $existHeaders = [];
+            $headers = $page->header();
+
+            if (isset($headers->videoembed)) {
+                $existHeaders = $headers->videoembed;
+            }
+
+            $page->header()->videoembed = array_merge(
+                $existHeaders,
+                ['assets' => $assets]
+            );
+        }
     }
 
     /**

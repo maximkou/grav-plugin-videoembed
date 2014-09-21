@@ -31,9 +31,31 @@ class VineTest extends AbstractServiceTest
             $this->createMatchesArray($vId, $urlQuery)
         );
 
-        $this->assertEquals($node, $nodes[0]);
-        $this->assertEquals($nodes[1]->nodeName, 'script');
-        $this->assertTrue($nodes[1]->hasAttribute('src'));
+        $this->assertEquals($node, $nodes);
+    }
+
+    /**
+     * @dataProvider dpGetEmbedType
+     */
+    public function testGetEmbedType($matches, $expectedType)
+    {
+        $service = $this->getMock(
+            '\\Grav\\Plugin\\VideoEmbed\\Service\\'.$this->getPluginName(),
+            null,
+            [[
+                'embed_options' => [
+                    'type' => 'postcard'
+                ]
+            ]]
+        );
+
+        $method = new \ReflectionMethod($service, 'getEmbedType');
+        $method->setAccessible(true);
+
+        $this->assertEquals(
+            $expectedType,
+            $method->invoke($service, $matches)
+        );
     }
 
     public function getPluginName()
@@ -52,6 +74,24 @@ class VineTest extends AbstractServiceTest
             5 => $videoId,
             7 => 'simple',
             8 => $urlQuery
+        ];
+    }
+
+    public function dpGetEmbedType()
+    {
+        return [
+            [
+                [7 => 'simple'], 'simple'
+            ],
+            [
+                [7 => 'postcard'], 'postcard'
+            ],
+            [
+                [7 => 'unexist'], 'simple'
+            ],
+            [
+                [], 'postcard'
+            ]
         ];
     }
 }

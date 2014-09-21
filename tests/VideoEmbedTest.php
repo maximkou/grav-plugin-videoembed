@@ -10,50 +10,6 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = '\\Grav\\Plugin\\VideoEmbedPlugin';
 
-    /**
-     * @dataProvider dpOnPageInitialized
-     */
-    public function testOnPageInitialized($isResponsiveConfig, $isResponsiveHeader)
-    {
-        $pageMock = $this->getMockBuilder('\\Grav\\Common\\Page\\Page')
-            ->setMethods(['value'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $pageMock->expects($this->any())
-            ->method('value')
-            ->with($this->equalTo('header.videoembed.responsive'))
-            ->willReturn($isResponsiveHeader);
-
-        $config = $this->getMock('\\Grav\Common\\Config', ['get'], [], '', false);
-        $config->expects($this->any())
-            ->method('get')
-            ->with($this->equalTo('plugins.videoembed.responsive'))
-            ->willReturn($isResponsiveConfig);
-
-        $grav = $this->getMock('\\Grav\Common\\Grav', null, [], '', false);
-        $grav->offsetSet('page', $pageMock);
-
-        $plugin = $this->getMock(
-            '\\Grav\\Plugin\\VideoEmbedPlugin',
-            ['enable'],
-            [$grav, $config]
-        );
-
-        if (
-            ($isResponsiveConfig === true && $isResponsiveHeader === null)
-            || $isResponsiveHeader === true
-        ) {
-            $plugin->expects($this->once())
-                ->method('enable')
-                ->with(
-                    $this->arrayHasKey('onTwigSiteVariables')
-                );
-        }
-
-        $plugin->onPageInitialized();
-    }
-
     public function testOnPageProcessed()
     {
         $event = $this->getMock(
