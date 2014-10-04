@@ -4,9 +4,9 @@ description: The **VideoEmbed** plugin converts links to videos from popular sha
 icon: video-camera
 author:
   name: Maxim Hodyrev
-  email: your_email_here
+  email: maximkou@gmail.com
 homepage: http://maximkou.github.io/grav-plugin-videoembed/
-keywords: videoembed, plugin, videos, services, youtube, vimeo, coub, vine
+keywords: videoembed, plugin, videos, services, youtube, vimeo, coub, vine, videojs
 bugs: https://github.com/maximkou/grav-plugin-videoembed/issues
 license: MIT
 
