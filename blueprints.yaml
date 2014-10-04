@@ -1,6 +1,14 @@
 name: VideoEmbed
-version: 1.0.0
-description: Convert links to videos into embed video.
+version: 1.3.0
+description: The **VideoEmbed** plugin converts links to videos from popular sharing services to embed format. Supported: YouTube, Vimeo, Coub, Vine and planned more services.
+icon: video-camera
+author:
+  name: Maxim Hodyrev
+  email: your_email_here
+homepage: http://maximkou.github.io/grav-plugin-videoembed/
+keywords: videoembed, plugin, videos, services, youtube, vimeo, coub, vine
+bugs: https://github.com/maximkou/grav-plugin-videoembed/issues
+license: MIT
 
 form:
   fields:
