@@ -3,7 +3,7 @@ namespace Grav\Plugin;
 
 use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
-use Grav\Component\EventDispatcher\Event;
+use RocketTheme\Toolbox\Event\Event;
 use \Grav\Common\Data\Data;
 
 /**
@@ -67,11 +67,11 @@ class VideoEmbedPlugin extends Plugin
         require_once __DIR__ . "/src/ServiceAbstract.php";
 
         /** @var \Grav\Common\Page\Page $page */
-        $page = $event->offsetGet('page');
+        $page = $event['page'];
 
         $content = $page->content();
-        $services = $this->getEnabledServicesSettings();
-        $container = $this->getEmbedContainer();
+        $services = $this->getEnabledServicesSettings($page);
+        $container = $this->getEmbedContainer($page);
 
         $usedServices = [];
         foreach ($services as $serviceName => $serviceConfig) {
@@ -97,9 +97,9 @@ class VideoEmbedPlugin extends Plugin
      * Enabled services settings
      * @return array
      */
-    public function getEnabledServicesSettings()
+    public function getEnabledServicesSettings(Page $page)
     {
-        $services = (array)$this->getConfig()->get('services');
+        $services = (array)$this->getConfig($page)->get('services');
 
         return array_filter($services, function ($config) {
             return (!empty($config['enabled']) && $config['enabled']);
@@ -156,10 +156,10 @@ class VideoEmbedPlugin extends Plugin
      * @return \Grav\Common\Data\Data
      * @codeCoverageIgnore
      */
-    protected function getConfig()
+    protected function getConfig(Page $page)
     {
         if (!$this->cfg) {
-            return $this->initConfig();
+            return $this->initConfig($page);
         }
 
         return $this->cfg;
@@ -171,12 +171,12 @@ class VideoEmbedPlugin extends Plugin
      * @return \Grav\Common\Data\Data
      * @throws \ErrorException
      */
-    protected function initConfig($userConfig = [])
+    protected function initConfig(Page $page, $userConfig = [])
     {
         $config = (array)$this->config->get('plugins.videoembed', []);
 
-        if (isset($this->grav['page'])) {
-            $headers = $this->grav['page']->header();
+        if (isset($page)) {
+            $headers = $page->header();
 
             if (isset($headers->videoembed)) {
                 $config = $this->mergeOptions($config, (array)$headers->videoembed);
@@ -190,7 +190,7 @@ class VideoEmbedPlugin extends Plugin
         $this->cfg = new Data($config);
 
         if ($this->cfg->get('responsive')) {
-            $this->enableResponsiveness();
+            $this->enableResponsiveness($page);
         }
 
         return $this->cfg;
@@ -199,9 +199,9 @@ class VideoEmbedPlugin extends Plugin
     /**
      * @throws \ErrorException
      */
-    protected function enableResponsiveness()
+    protected function enableResponsiveness(Page $page)
     {
-        $config = $this->getConfig();
+        $config = $this->getConfig($page);
 
         /**
          * if you enable responsiveness, you need use some container for video
@@ -241,12 +241,12 @@ class VideoEmbedPlugin extends Plugin
             return;
         }
 
-        $assets = (array)$this->getConfig()->get('assets', []);
+        $assets = (array)$this->getConfig($page)->get('assets', []);
 
         foreach ($services as $name) {
             $assets = array_merge(
                 $assets,
-                $this->getConfig()->get("services.$name.assets", [])
+                $this->getConfig($page)->get("services.$name.assets", [])
             );
         }
 
@@ -270,13 +270,13 @@ class VideoEmbedPlugin extends Plugin
     /**
      * @return \DOMElement|null
      */
-    protected function getEmbedContainer()
+    protected function getEmbedContainer(Page $page)
     {
         $container = null;
-        if ($cElem = $this->getConfig()->get('container.element')) {
+        if ($cElem = $this->getConfig($page)->get('container.element')) {
             $document = new \DOMDocument();
             $container = $document->createElement($cElem);
-            $containerAttr = (array)$this->getConfig()->get('container.html_attr', []);
+            $containerAttr = (array)$this->getConfig($page)->get('container.html_attr', []);
             foreach ($containerAttr as $htmlAttr => $attrValue) {
                 $container->setAttribute($htmlAttr, $attrValue);
             }
