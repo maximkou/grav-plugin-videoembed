@@ -1,7 +1,6 @@
 <?php
 namespace Grav\Plugin\VideoEmbed\Tests;
-use Grav\Common\Assets;
-use Grav\Common\Config;
+
 use Grav\Common\Data\Data;
 
 /**
@@ -108,7 +107,7 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
 
         $services = array_filter(
             (array)$config->get('services', []),
-            function($s) {
+            function ($s) {
                 return !empty($s['enabled']);
             }
         );
