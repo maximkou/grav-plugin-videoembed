@@ -1,10 +1,11 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Assets;
 use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
-use Grav\Component\EventDispatcher\Event;
-use \Grav\Common\Data\Data;
+use RocketTheme\Toolbox\Event\Event;
+use Grav\Common\Data\Data;
 
 /**
  * Class VideoEmbedPlugin
@@ -21,7 +22,7 @@ class VideoEmbedPlugin extends Plugin
     /**
      * @var \Grav\Common\Data\Data
      */
-    protected $cfg;
+    private $cfg;
 
     /**
      * @return array
@@ -43,23 +44,14 @@ class VideoEmbedPlugin extends Plugin
      */
     public function onTwigSiteVariables()
     {
-        /** @var \Grav\Common\Page\Page $page */
-        $page = $this->grav['page'];
-
-        $assets = [];
-        if (!empty($page->header()->videoembed['assets'])) {
-            $assets = (array)$page->header()->videoembed['assets'];
-        }
-
-        foreach ($assets as $asset) {
-            $this->grav['assets']->add($asset);
-        }
+        $this->addAssets($this->grav['page'], $this->grav['assets']);
     }
 
     /**
      * Process links in page
      * @param Event $event
      * @throws \Exception
+     * @codeCoverageIgnore
      */
     public function onPageProcessed(Event $event)
     {
@@ -67,43 +59,15 @@ class VideoEmbedPlugin extends Plugin
         require_once __DIR__ . "/src/ServiceAbstract.php";
 
         /** @var \Grav\Common\Page\Page $page */
-        $page = $event->offsetGet('page');
+        $page = $event['page'];
+        $config = $this->getConfig($page);
 
-        $content = $page->content();
-        $services = $this->getEnabledServicesSettings();
-        $container = $this->getEmbedContainer();
-
-        $usedServices = [];
-        foreach ($services as $serviceName => $serviceConfig) {
-            $service = $this->getServiceByName($serviceName, $serviceConfig);
-            $content = $service->processHtml($content, $container, $processedCnt);
-
-            if ($processedCnt > 0) {
-                $usedServices[] = $serviceName;
-            }
-        }
-
-        if (!empty($usedServices)) {
-            $this->defineAssets($page, $usedServices);
-        }
+        $content = $this->processPage($page, $config);
 
         $isProcessMarkdown = $page->shouldProcess('markdown');
         $page->process(['markdown' => false]);
         $page->content($content);
         $page->process(['markdown' => $isProcessMarkdown]);
-    }
-
-    /**
-     * Enabled services settings
-     * @return array
-     */
-    public function getEnabledServicesSettings()
-    {
-        $services = (array)$this->getConfig()->get('services');
-
-        return array_filter($services, function ($config) {
-            return (!empty($config['enabled']) && $config['enabled']);
-        });
     }
 
     /**
@@ -128,81 +92,82 @@ class VideoEmbedPlugin extends Plugin
     }
 
     /**
-     * Merge options recursively
-     *
-     * @param  array $array1
-     * @param  mixed $array2
-     * @return array
-     * @codeCoverageIgnore
-     */
-    protected function mergeOptions(array $array1, $array2 = null)
-    {
-        if (is_array($array2)) {
-            foreach ($array2 as $key => $val) {
-                if (is_array($array2[$key])) {
-                    $array1[$key] = (array_key_exists($key, $array1) && is_array($array1[$key]))
-                        ? $this->mergeOptions($array1[$key], $array2[$key])
-                        : $array2[$key];
-                } else {
-                    $array1[$key] = $val;
-                }
-            }
-        }
-
-        return $array1;
-    }
-
-    /**
+     * @param Page $page
      * @return \Grav\Common\Data\Data
      * @codeCoverageIgnore
      */
-    protected function getConfig()
+    protected function getConfig(Page $page = null)
     {
+        if ($this->cfg && empty($page)) {
+            return $this->cfg;
+        }
+
         if (!$this->cfg) {
-            return $this->initConfig();
+            $this->cfg = new Data(
+                (array)$this->config->get('plugins.videoembed', [])
+            );
         }
 
-        return $this->cfg;
-    }
-
-    /**
-     * Init config and merge this with user params
-     * @param array $userConfig
-     * @return \Grav\Common\Data\Data
-     * @throws \ErrorException
-     */
-    protected function initConfig($userConfig = [])
-    {
-        $config = (array)$this->config->get('plugins.videoembed', []);
-
-        if (isset($this->grav['page'])) {
-            $headers = $this->grav['page']->header();
+        if (!empty($page)) {
+            $headers = $page->header();
 
             if (isset($headers->videoembed)) {
-                $config = $this->mergeOptions($config, (array)$headers->videoembed);
+                $this->cfg = new Data(
+                    $this->mergeOptions(
+                        $this->cfg->toArray(),
+                        (array)$headers->videoembed
+                    )
+                );
             }
-        }
-
-        if (!empty($userConfig)) {
-            $config = $this->mergeOptions($config, $userConfig);
-        }
-
-        $this->cfg = new Data($config);
-
-        if ($this->cfg->get('responsive')) {
-            $this->enableResponsiveness();
         }
 
         return $this->cfg;
     }
 
     /**
+     * @param Page $page
+     * @param Data $config
+     * @return string
+     * @throws \ErrorException
+     * @throws \Exception
+     */
+    protected function processPage(Page $page, Data $config)
+    {
+        if ($config->get('responsive')) {
+            $this->enableResponsiveness($config);
+        }
+
+        $container = $this->getEmbedContainer($config);
+        $services = array_filter(
+            (array)$config->get('services', []),
+            function ($service) {
+                return !empty($service['enabled']);
+            }
+        );
+
+        $usedServices = [];
+        $content = $page->content();
+        foreach ($services as $serviceName => $serviceConfig) {
+            $service = $this->getServiceByName($serviceName, $serviceConfig);
+            $content = $service->processHtml($content, $container, $processedCnt);
+
+            if ($processedCnt > 0) {
+                $usedServices[] = $serviceName;
+            }
+        }
+
+        if (!empty($usedServices)) {
+            $this->defineAssets($page, $config, $usedServices);
+        }
+
+        return $content;
+    }
+
+    /**
      * @throws \ErrorException
      */
-    protected function enableResponsiveness()
+    protected function enableResponsiveness(Data $config)
     {
-        $config = $this->getConfig();
-
         /**
          * if you enable responsiveness, you need use some container for video
          * @see http://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php
@@ -233,23 +198,22 @@ class VideoEmbedPlugin extends Plugin
 
     /**
      * @param Page $page
+     * @param Data $config
      * @param array $services
      */
-    protected function defineAssets(Page $page, array $services)
+    protected function defineAssets(Page $page, Data $config, array $services)
     {
         if (empty($services)) {
             return;
         }
 
-        $assets = (array)$this->getConfig()->get('assets', []);
-
+        $assets = (array)$config->get('assets', []);
         foreach ($services as $name) {
             $assets = array_merge(
                 $assets,
-                $this->getConfig()->get("services.$name.assets", [])
+                $config->get("services.$name.assets", [])
             );
         }
-
         $assets = array_unique($assets);
 
         if (!empty($assets)) {
@@ -268,20 +232,64 @@ class VideoEmbedPlugin extends Plugin
     }
 
     /**
+     * Add plugin specific assets
+     * @param Page $page
+     * @param Assets $assets
+     */
+    protected function addAssets(Page $page, Assets $assets)
+    {
+        $pluginAssets = [];
+        if (!empty($page->header()->videoembed['assets'])) {
+            $pluginAssets = (array)$page->header()->videoembed['assets'];
+        }
+
+        foreach ($pluginAssets as $asset) {
+            $assets->add($asset);
+        }
+    }
+
+    /**
+     * @param Data $config
      * @return \DOMElement|null
      */
-    protected function getEmbedContainer()
+    protected function getEmbedContainer(Data $config)
     {
         $container = null;
-        if ($cElem = $this->getConfig()->get('container.element')) {
+        if ($cElem = $config->get('container.element')) {
             $document = new \DOMDocument();
             $container = $document->createElement($cElem);
-            $containerAttr = (array)$this->getConfig()->get('container.html_attr', []);
+            $containerAttr = (array)$config->get('container.html_attr', []);
+
             foreach ($containerAttr as $htmlAttr => $attrValue) {
                 $container->setAttribute($htmlAttr, $attrValue);
             }
         }
 
         return $container;
+    }
+
+    /**
+     * Merge options recursively
+     *
+     * @param  array $array1
+     * @param  mixed $array2
+     * @return array
+     * @codeCoverageIgnore
+     */
+    protected function mergeOptions(array $array1, $array2 = null)
+    {
+        if (is_array($array2)) {
+            foreach ($array2 as $key => $val) {
+                if (is_array($array2[$key])) {
+                    $array1[$key] = (array_key_exists($key, $array1) && is_array($array1[$key]))
+                        ? $this->mergeOptions($array1[$key], $array2[$key])
+                        : $array2[$key];
+                } else {
+                    $array1[$key] = $val;
+                }
+            }
+        }
+
+        return $array1;
     }
 }

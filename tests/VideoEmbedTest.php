@@ -1,5 +1,8 @@
 <?php
 namespace Grav\Plugin\VideoEmbed\Tests;
+use Grav\Common\Assets;
+use Grav\Common\Config;
+use Grav\Common\Data\Data;
 
 /**
  * Class YoutubeTest
@@ -10,152 +13,130 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = '\\Grav\\Plugin\\VideoEmbedPlugin';
 
-    public function testOnPageProcessed()
-    {
-        $event = $this->getMock(
-            '\\Grav\\Component\\EventDispatcher\\Event',
-            ['offsetGet']
-        );
-
-        $page = $this->getMock(
-            '\\Grav\\Common\\Page\\Page',
-            ['content', 'header'],
-            [],
-            '',
-            false
-        );
-        $page->expects($this->exactly(2))
-            ->method('content')
-            ->willReturn(
-                $this->equalTo('testContent')
-            );
-        $page->expects($this->any())
-            ->method('header')
-            ->willReturn(
-                (object)[]
-            );
-
-        $event->expects($this->any())
-            ->method('offsetGet')
-            ->willReturn($page);
-
-        $fakeService = $this->getMock(
-            '\\Grav\\Plugin\\VideoEmbed\\Tests\\Fake\\Service',
-            ['processHtml']
-        );
-        $fakeService->expects($this->any())
-            ->method('processHtml')
-            ->willReturn('testContent');
-
-        $grav = $this->getMock('\\Grav\Common\\Grav', [], [], '', false);
-        $config = $this->getMock('\\Grav\Common\\Config', ['get'], [], '', false);
-        $config->expects($this->at(0))
-            ->method('get')
-            ->with(
-                $this->equalTo('plugins.videoembed'),
-                $this->anything(),
-                $this->anything()
-            )
-            ->willReturn([
-                'container' => [
-                    'element' => 'div',
-                    'html_attr' => ['class' => 'container']
-                ]
-            ]);
-
-        $plugin = $this->getMock(
-            '\\Grav\\Plugin\\VideoEmbedPlugin',
-            ['getEnabledServicesSettings', 'getServiceByName'],
-            [$grav, $config]
-        );
-        $plugin->expects($this->any())
-            ->method('getEnabledServicesSettings')
-            ->willReturn(
-                ['test' => []]
-            );
-        $plugin->expects($this->any())
-            ->method('getServiceByName')
-            ->willReturn($fakeService);
-
-        $plugin->onPageProcessed($event);
-    }
-
-    public function testGetEnabledServicesSettings()
-    {
-        $res = $this->getPluginMock()->getEnabledServicesSettings();
-        $this->assertArrayHasKey('testService', $res);
-        $this->assertArrayNotHasKey('testServiceDisabled', $res);
-    }
+    protected $config = [
+        'responsive' => true,
+        'test' => 'yes'
+    ];
 
     /**
      * @dataProvider dpGetServiceByName
      */
     public function testGetServiceByName($serviceName, $exist = true)
     {
-        $method = new \ReflectionMethod('\\Grav\\Plugin\\VideoEmbedPlugin', 'getServiceByName');
+        $method = new \ReflectionMethod(self::CLASS_NAME, 'getServiceByName');
         $method->setAccessible(true);
 
         if (!$exist) {
             $this->setExpectedException('\Exception');
         }
 
+        $plugin = $this->getMockBuilder(self::CLASS_NAME)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->assertInstanceOf(
             '\\Grav\\Plugin\\VideoEmbed\\ServiceInterface',
-            $method->invoke($this->getPluginMock(), $serviceName)
+            $method->invoke($plugin, $serviceName)
+        );
+    }
+
+    public function testGetConfig()
+    {
+        $page = $this->getMockBuilder('\\Grav\\Common\\Page\\Page')
+            ->disableOriginalConstructor()
+            ->setMethods(['header'])
+            ->getMock();
+
+        $pluginConfig = [
+            'responsive' => false
+        ];
+
+        $page->expects($this->once())
+            ->method('header')
+            ->willReturn(
+                (object)[
+                    'videoembed' => $pluginConfig
+                ]
+            );
+
+        $plugin = $this->getPluginMockBld()->getMock();
+
+        $mergeOptions = new \ReflectionMethod(self::CLASS_NAME, 'mergeOptions');
+        $mergeOptions->setAccessible(true);
+        $getConfig = new \ReflectionMethod(self::CLASS_NAME, 'getConfig');
+        $getConfig->setAccessible(true);
+
+        $this->assertEquals(
+            $this->config,
+            $getConfig->invoke($plugin)->toArray()
+        );
+
+        $this->assertEquals(
+            $mergeOptions->invoke($plugin, $this->config, $pluginConfig),
+            $getConfig->invoke($plugin, $page)->toArray()
         );
     }
 
     /**
-     * @dataProvider dpInitConfig
+     * @dataProvider dpProcessPage
      */
-    public function testInitConfig(array $globalConfig, array $userConfig)
+    public function testProcessPage(array $config)
     {
-        $optionsMerge = new \ReflectionMethod(self::CLASS_NAME, 'mergeOptions');
-        $optionsMerge->setAccessible(true);
+        $config = new Data($config);
 
-        $config = $this->getMock('\\Grav\Common\\Config', ['get'], [], '', false);
-        $config->expects($this->any())
-            ->method('get')
-            ->with($this->equalTo('plugins.videoembed'))
-            ->willReturn($globalConfig);
+        $plugin = $this
+            ->getPluginMockBld()
+            ->setMethods([
+                'defineAssets',
+                'enableResponsiveness',
+                'getEmbedContainer',
+                'getServiceByName'
+            ])
+            ->getMock();
 
+        $plugin
+            ->expects($config->get('responsive') ? $this->once() : $this->never())
+            ->method('enableResponsiveness');
 
-        $grav = $this->getMock('\\Grav\Common\\Grav', null, [], '', false);
+        $doc = new \DOMDocument();
+        $container = $doc->createElement('test');
 
-        $plugin = $this->getMock(
-            '\\Grav\\Plugin\\VideoEmbedPlugin',
-            ['enable'],
-            [$grav, $config]
+        $plugin
+            ->expects($this->once())
+            ->method('getEmbedContainer')
+            ->willReturn($container);
+
+        $services = array_filter(
+            (array)$config->get('services', []),
+            function($s) {
+                return !empty($s['enabled']);
+            }
         );
-        $methodReflection = new \ReflectionMethod(self::CLASS_NAME, 'initConfig');
-        $methodReflection->setAccessible(true);
 
-        $opts = $optionsMerge->invoke($plugin, $globalConfig, $userConfig);
-        $opts = new \Grav\Common\Data\Data($opts);
+        $service = $this->getMockBuilder('\\Grav\\Plugin\\VideoEmbed\\Tests\\Fake\\Service')
+            ->setMethods(['processHtml'])
+            ->getMock();
+        $service
+            ->expects($this->exactly(count($services)))
+            ->method('processHtml');
 
-        if ($isErrorExpected = (!$opts->get('container.element') && $opts->get('responsive', false))) {
-            $this->setExpectedException('\ErrorException');
-        }
+        $plugin
+            ->expects($this->exactly(count($services)))
+            ->method('getServiceByName')
+            ->willReturn($service);
 
-        $resultCfg = $methodReflection->invoke($plugin, $userConfig);
-        if (!$isErrorExpected && $opts->get('responsive', false)) {
-            $this->assertContains(
-                'plugin-videoembed-container-fluid',
-                $resultCfg->get('container.html_attr.class')
-            );
-        }
-    }
+        $plugin
+            ->expects($this->never())
+            ->method('defineAssets');
 
-    public function dpOnPageInitialized()
-    {
-        return [
-            [false, true],
-            [false, null],
-            [false, false],
-            [true, true],
-            [true, null],
-            [true, false]
-        ];
+        $page = $this->getMockBuilder('\\Grav\\Common\\Page\\Page')
+            ->setMethods(['content'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $processPage = new \ReflectionMethod(self::CLASS_NAME, 'processPage');
+        $processPage->setAccessible(true);
+        $processPage->invoke($plugin, $page, $config);
     }
 
     public function dpGetServiceByName()
@@ -177,60 +158,48 @@ class VideoEmbedTest extends \PHPUnit_Framework_TestCase
         return $data;
     }
 
-    public function dpInitConfig()
+    public function dpProcessPage()
     {
         return [
             [
                 [
-                    'container' => [
-                        'element' => false
-                    ],
-                    'responsive' => false
-                ],
-                [
-                    'responsive' => true
+                    'responsive' => true,
+                    'services' => [
+                        'test' => [
+                            'enabled' => true,
+                        ]
+                    ]
                 ]
             ],
             [
                 [
-                    'container' => [
-                        'element' => false
-                    ],
-                    'responsive' => false
-                ],
-                []
-            ],
-            [
-                [
-                    'container' => [
-                        'element' => 'div'
-                    ],
-                    'responsive' => true
-                ],
-                []
+                    'responsive' => false,
+                    'services' => [
+                        'test' => [
+                            'enabled' => true,
+                        ],
+                        'testDis' => [
+                            'enabled' => false,
+                        ]
+                    ]
+                ]
             ]
         ];
     }
 
-    protected function getPluginMock()
+    protected function getPluginMockBld()
     {
-        $grav = $this->getMock('\\Grav\Common\\Grav', [], [], '', false);
-        $config = $this->getMock('\\Grav\Common\\Config', ['get'], [], '', false);
-        $config->expects($this->any())
-            ->method('get')
-            ->willReturn(
-                [
-                    'services' => [
-                        'testService' => ['enabled' => true],
-                        'testServiceDisabled' => ['enabled' => false]
-                    ]
-                ]
-            );
+        $grav = $this->getMockBuilder('\\Grav\\Common\\Grav')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        return $this->getMock(
-            '\\Grav\\Plugin\\VideoEmbedPlugin',
-            null,
-            [$grav, $config]
-        );
+        $config = $this->getMockBuilder('\\Grav\\Common\\Config')
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->set('plugins.videoembed', $this->config);
+
+        return $this->getMockBuilder(self::CLASS_NAME)
+            ->setConstructorArgs([$grav, $config]);
     }
 }
