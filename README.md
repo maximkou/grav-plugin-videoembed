@@ -87,12 +87,13 @@ If you have not use wrapper, remove or comment this directive.
 All services configuration located in `services` section of `videoembed.yaml`.
 
 **Available options:**
-
-* *enabled*: disable/enable some service support.
-* *assets*: add service-specific assets(`js`, `css`) into page `<HEAD>` block. Assets will be added, if service support enabled and if least one link to service was replaced.
-* *embed_html_attr*: html attributes for embed element(iframe/video), e.g. `width: 0` will create `<iframe width="0">...</iframe>`
-* *embed_options*: video options, e.g. autoplay (not available for self-hosted videos(`VideoJS`))
-* *data_setup (only for `VideoJS`)*: video options, see more [here](https://github.com/videojs/video.js/blob/stable/docs/guides/options.md)
+Option  | Description
+------- | -----------
+enabled | disable/enable some service support
+assets  |  add service-specific assets(`js`, `css`) into page `<HEAD>` block. Assets will be added, if service support enabled and if least one link to service was replaced
+embed_html_attr | html attributes for embed element(iframe/video), e.g. `width: 0` will create `<iframe width="0">...</iframe>`
+embed_options | video options for non self-hosted videos, e.g. autoplay
+data_setup | video options for self-hosted videos, see more [here](https://github.com/videojs/video.js/blob/stable/docs/guides/options.md)
 
 **Default services configuration:**
 
