@@ -1,0 +1,10 @@
+{
+    "embed_html_attr": {
+        "test": "okay",
+        "allowfullscreen": false
+    },
+    "embed_options": {
+        "autoplay": 0,
+        "type": "postcard"
+    }
+}
