@@ -31,20 +31,9 @@ class VideoEmbedPlugin extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
             'onPageProcessed' => ['onPageProcessed', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
         ];
-    }
-
-    /**
-     * Add styles for video responsiveness
-     * @see onPageInitialized
-     * @return void
-     * @codeCoverageIgnore
-     */
-    public function onTwigSiteVariables()
-    {
-        $this->addAssets($this->grav['page'], $this->grav['assets']);
     }
 
     /**
@@ -62,12 +51,25 @@ class VideoEmbedPlugin extends Plugin
         $page = $event['page'];
         $config = $this->getConfig($page);
 
-        $content = $this->processPage($page, $config);
+        if ($this->active) {
+            $content = $this->processPage($page, $config);
 
-        $isProcessMarkdown = $page->shouldProcess('markdown');
-        $page->process(['markdown' => false]);
-        $page->content($content);
-        $page->process(['markdown' => $isProcessMarkdown]);
+            $isProcessMarkdown = $page->shouldProcess('markdown');
+            $page->process(['markdown' => false]);
+            $page->content($content);
+            $page->process(['markdown' => $isProcessMarkdown]);
+        }
+    }
+
+    /**
+     * Add styles for video responsiveness
+     * @see onPageInitialized
+     * @return void
+     * @codeCoverageIgnore
+     */
+    public function onTwigSiteVariables()
+    {
+        $this->addAssets($this->grav['page'], $this->grav['assets']);
     }
 
     /**
@@ -108,10 +110,22 @@ class VideoEmbedPlugin extends Plugin
             );
         }
 
+        if (!$this->cfg->get('all_pages')) {
+            $this->active = false;
+        }
+
         if (!empty($page)) {
             $headers = $page->header();
 
             if (isset($headers->videoembed)) {
+
+                if ($headers->videoembed == false) {
+                    $this->active = false;
+                    return $this->cfg;
+                }
+
+                $this->active = true;
+
                 $this->cfg = new Data(
                     $this->mergeOptions(
                         $this->cfg->toArray(),
