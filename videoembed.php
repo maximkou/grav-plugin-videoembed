@@ -32,7 +32,7 @@ class VideoEmbedPlugin extends Plugin
     {
         return [
             'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-            'onPageProcessed' => ['onPageProcessed', 0],
+            'onPageContentProcessed' => ['onPageContentProcessed', 0],
         ];
     }
 
@@ -53,7 +53,7 @@ class VideoEmbedPlugin extends Plugin
      * @throws \Exception
      * @codeCoverageIgnore
      */
-    public function onPageProcessed(Event $event)
+    public function onPageContentProcessed(Event $event)
     {
         require_once __DIR__ . "/src/ServiceInterface.php";
         require_once __DIR__ . "/src/ServiceAbstract.php";
