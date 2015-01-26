@@ -1,5 +1,5 @@
 name: VideoEmbed
-version: 1.4.0
+version: 1.4.1
 description: Convert links to videos from popular sharing services to embed format. Now plugin supports: self-hosted videos, Youtube, Vimeo, Vine, Coub.com.
 icon: youtube-play
 author:
