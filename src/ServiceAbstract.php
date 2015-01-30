@@ -50,7 +50,7 @@ abstract class ServiceAbstract implements ServiceInterface
     public function processHtml($html, \DOMNode $container = null, &$replacedCount = null)
     {
         $urlRegExpr = $this->getRegExpression();
-        $linkRegexp = "/<a href=\"$urlRegExpr\">$urlRegExpr<\/a>/i";
+        $linkRegexp = "/<p>$urlRegExpr<\/p>/i";
 
         $document = new \DOMDocument();
 
