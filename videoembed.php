@@ -160,7 +160,7 @@ class VideoEmbedPlugin extends Plugin
         );
 
         $usedServices = [];
-        $content = $page->content();
+        $content = $page->getRawContent();
         foreach ($services as $serviceName => $serviceConfig) {
             $service = $this->getServiceByName($serviceName, $serviceConfig);
             $content = $service->processHtml($content, $container, $processedCnt);
