@@ -1,5 +1,9 @@
+Project closed. See actual plugin version [here](https://github.com/Sommerregen/grav-plugin-videoembed)
+===========================================================================================
+
 Embed Video plugin for [Grav CMS](http://getgrav.org)
 -------------------------------------------------
+
 [![Build Status](https://travis-ci.org/maximkou/grav-plugin-videoembed.svg?branch=v1.0)](https://travis-ci.org/maximkou/grav-plugin-videoembed)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/maximkou/grav-plugin-videoembed/?branch=master)
