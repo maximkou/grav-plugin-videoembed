@@ -1,5 +1,5 @@
 enabled: true
-
+all_pages: true
 responsive: false
 container:
     element: div
