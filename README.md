@@ -93,6 +93,7 @@ All services configuration located in `services` section of `videoembed.yaml`.
 **Available options:**
 
 * *enabled*: disable/enable some service support.
+* *all_pages*: disable/enable processing on all pages by deafult
 * *assets*: add service-specific assets(`js`, `css`) into page `<HEAD>` block. Assets will be added, if service support enabled and if least one link to service was replaced.
 * *embed_html_attr*: html attributes for embed element(iframe/video), e.g. `width: 0` will create `<iframe width="0">...</iframe>`
 * *embed_options*: video options, e.g. autoplay (not available for self-hosted videos(`VideoJS`))
@@ -102,6 +103,18 @@ All services configuration located in `services` section of `videoembed.yaml`.
 
 You can see default services configuration in [videoembed.yaml](https://github.com/maximkou/grav-plugin-videoembed/blob/development/videoembed.yaml#L9) file.
 
+## Enabling and Disabling
+
+If you have **all_pages** option in your configuration set to `true` you can disable `videoembed` on a specific page by adding the following in your page header:
+
+```
+---
+# ... more headers
+videoembed: false
+---
+```
+
+If you have **all_pages** option in your configuration set to `false` you can enable on a specific page by either providing a `true` value or customization parameters for the `videoembed` option.
 
 ## Customizing single video/page videos parameters
 If you need set custom plugin parameters for single page, set plugin parameters in page header in section `videoembed`, e.g:

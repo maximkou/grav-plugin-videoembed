@@ -32,8 +32,33 @@ class VideoEmbedPlugin extends Plugin
     {
         return [
             'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-            'onPageProcessed' => ['onPageProcessed', 0],
+            'onPageContentProcessed' => ['onPageContentProcessed', 0],
         ];
+    }
+
+    /**
+     * Process links in page
+     * @param Event $event
+     * @throws \Exception
+     * @codeCoverageIgnore
+     */
+    public function onPageContentProcessed(Event $event)
+    {
+        require_once __DIR__ . "/src/ServiceInterface.php";
+        require_once __DIR__ . "/src/ServiceAbstract.php";
+
+        /** @var \Grav\Common\Page\Page $page */
+        $page = $event['page'];
+        $config = $this->getConfig($page);
+
+        if ( $this->active ) {
+            $content = $this->processPage($page, $config);
+
+            $isProcessMarkdown = $page->shouldProcess('markdown');
+            $page->process(['markdown' => false]);
+            $page->setRawContent($content);
+            $page->process(['markdown' => $isProcessMarkdown]);
+        }
     }
 
     /**
@@ -45,29 +70,6 @@ class VideoEmbedPlugin extends Plugin
     public function onTwigSiteVariables()
     {
         $this->addAssets($this->grav['page'], $this->grav['assets']);
-    }
-
-    /**
-     * Process links in page
-     * @param Event $event
-     * @throws \Exception
-     * @codeCoverageIgnore
-     */
-    public function onPageProcessed(Event $event)
-    {
-        require_once __DIR__ . "/src/ServiceInterface.php";
-        require_once __DIR__ . "/src/ServiceAbstract.php";
-
-        /** @var \Grav\Common\Page\Page $page */
-        $page = $event['page'];
-        $config = $this->getConfig($page);
-
-        $content = $this->processPage($page, $config);
-
-        $isProcessMarkdown = $page->shouldProcess('markdown');
-        $page->process(['markdown' => false]);
-        $page->content($content);
-        $page->process(['markdown' => $isProcessMarkdown]);
     }
 
     /**
@@ -108,10 +110,22 @@ class VideoEmbedPlugin extends Plugin
             );
         }
 
+        if (!$this->cfg->get('all_pages')) {
+            $this->active = false;
+        }
+
         if (!empty($page)) {
             $headers = $page->header();
 
             if (isset($headers->videoembed)) {
+
+                if ($headers->videoembed == false) {
+                    $this->active = false;
+                    return $this->cfg;
+                }
+
+                $this->active = true;
+
                 $this->cfg = new Data(
                     $this->mergeOptions(
                         $this->cfg->toArray(),
@@ -146,7 +160,7 @@ class VideoEmbedPlugin extends Plugin
         );
 
         $usedServices = [];
-        $content = $page->content();
+        $content = $page->getRawContent();
         foreach ($services as $serviceName => $serviceConfig) {
             $service = $this->getServiceByName($serviceName, $serviceConfig);
             $content = $service->processHtml($content, $container, $processedCnt);
